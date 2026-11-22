@@ -99,9 +99,9 @@ export function Calculator() {
         <div className="divider" />
 
         <div className="stack">
-          <Stepper label="Vial size" unit="mg" step={0.5} value={d.vialMg} onChange={(vialMg) => update({ vialMg })} chips={[5, 10, 15, 20, 30]} />
-          <Stepper label="Water added" unit="mL" step={0.1} value={d.waterMl} onChange={(waterMl) => update({ waterMl })} chips={[1, 1.5, 2, 2.5, 3]} />
-          <Stepper label="Dose" unit="mg" step={0.25} value={d.doseMg} onChange={(doseMg) => update({ doseMg })} chips={[0.5, 1, 1.5, 2, 2.5]} />
+          <Stepper label="Vial size" unit="mg" step={0.5} value={d.vialMg} onChange={(vialMg) => update({ vialMg })} />
+          <Stepper label="Water added" unit="mL" step={0.1} value={d.waterMl} onChange={(waterMl) => update({ waterMl })} />
+          <Stepper label="Dose" unit="mg" step={0.25} value={d.doseMg} onChange={(doseMg) => update({ doseMg })} />
           <input
             className="text-input"
             aria-label="Peptide name (optional)"

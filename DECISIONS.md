@@ -84,3 +84,10 @@ Calls made while building without asking.
 
 ## Round 8: syringe glyph icon
 - **Icon:** a classic solid syringe pictogram, white on flat burgundy (#6E1E2E, picked from 30 colour options), redrawn from a stock glyph Gus supplied: T plunger separated from the flange by a gap, wide flange, square-ended barrel with three notches, a gap of the same width before the tapered tip, thin needle. Replaces the measure-marks icon. `scripts/make-icons.mjs` now writes `favicon.svg` from the same parts list so the two always match.
+
+## Round 9: swipe, Home layout, calculator, top spacing
+- **Swipe between tabs** from anywhere on the page (`src/lib/swipe.ts`). A fractional `--pos` drives the track, the tab-bar lens, the background shift and each colour layer's opacity, so they all follow the finger. Commits past 25% of the width or on a flick, otherwise springs back; vertical drags stay normal scrolling; text fields and sideways rows are left alone.
+- **Colour change** is slower (0.9s, separate from the 0.45s slide) with a bigger parallax shift, so it reads.
+- **Calculator:** the quick-pick chips under vial, water and dose are gone; just − / +.
+- **Home** is now a centred countdown dial card, then two tiles (weight, vial), then the calculator link, with more even spacing.
+- **Top blur (home-screen app only):** iOS draws a blur band under the status bar in standalone mode that we can't change, so content starts 28px lower there (Safari is unchanged).

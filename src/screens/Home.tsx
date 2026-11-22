@@ -7,7 +7,7 @@ import { PillButton } from '../components/PillButton';
 import { CalcIcon, ChevronR, GearIcon, Plus } from '../components/Icons';
 import type { Tab } from '../components/TabBar';
 import { JabSheet, useJabData, vialStatus } from './Jabs';
-import { Chart, WeightSheet } from './Body';
+import { WeightSheet } from './Body';
 
 const greeting = () => {
   const h = new Date().getHours();
@@ -18,17 +18,21 @@ const ago = (iso: string) => {
   return d <= 0 ? 'Today' : d === 1 ? 'Yesterday' : `${d} days ago`;
 };
 
-const countdownText = (n: number) =>
-  n > 1 ? `${n} days` : n === 1 ? 'Tomorrow' : n === 0 ? 'Today' : `${-n} day${n === -1 ? '' : 's'} late`;
+/** The countdown as [big figure, caption] for inside the dial. */
+const countdown = (n: number): [string, string] =>
+  n > 1 ? [String(n), 'days to go'] : n === 1 ? ['1', 'day to go'] : n === 0 ? ['Today', 'jab day'] : [String(-n), `day${n === -1 ? '' : 's'} late`];
 
-/** Glass ring showing how far through the jab interval we are. */
-function Ring({ fraction }: { fraction: number }) {
-  const c = 2 * Math.PI * 26;
+/** Ring that fills as jab day approaches, with the countdown in the middle. */
+function Dial({ fraction, children }: { fraction: number; children: React.ReactNode }) {
+  const c = 2 * Math.PI * 76;
   return (
-    <svg className="ring" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
-      <circle cx="32" cy="32" r="26" />
-      <circle cx="32" cy="32" r="26" className="v" strokeDasharray={`${fraction * c} ${c}`} />
-    </svg>
+    <div className="dial">
+      <svg viewBox="0 0 168 168" aria-hidden="true">
+        <circle cx="84" cy="84" r="76" />
+        <circle cx="84" cy="84" r="76" className="v" strokeDasharray={`${fraction * c} ${c}`} />
+      </svg>
+      <div className="in">{children}</div>
+    </div>
   );
 }
 
@@ -46,8 +50,10 @@ export function Home({ go, openSettings }: { go: (t: Tab) => void; openSettings:
   const latest = weights[weights.length - 1];
   const change = weights.length > 1 ? latest.kg - weights[0].kg : 0;
 
+  const [fig, cap] = next ? countdown(next.daysLeft) : ['—', 'not started'];
+
   return (
-    <>
+    <div className="home">
       <div className="spread" style={{ alignItems: 'flex-start' }}>
         <div>
           <h1 className="title">{greeting()}</h1>
@@ -56,44 +62,43 @@ export function Home({ go, openSettings }: { go: (t: Tab) => void; openSettings:
         <IconButton label="Settings" onClick={openSettings}><GearIcon /></IconButton>
       </div>
 
-      <Glass className="stack">
-        <div className="spread">
-          <div>
-            <div className="label">Next jab · {peptide} · every {every} day{every === 1 ? '' : 's'}</div>
-            <div className={`big-num ${next && next.daysLeft < 0 ? 'late' : ''}`}>{next ? countdownText(next.daysLeft) : 'Not started'}</div>
-            <div className="small muted" style={{ marginTop: 6 }}>
-              {next
-                ? <>Due {fmtDate(next.dueIso, { weekday: 'short', day: 'numeric', month: 'short' })} · last {ago(last.date).toLowerCase()}, {round1(last.units)} u / {round2(last.doseMg)} mg</>
-                : 'Log your first jab to start the countdown.'}
-            </div>
-          </div>
-          {next && <Ring fraction={next.fraction} />}
+      <Glass className="hero-card">
+        <div className="label">Next jab · {peptide}</div>
+        <Dial fraction={next ? next.fraction : 0}>
+          <span className={`n ${next && next.daysLeft < 0 ? 'late' : ''}`}>{fig}</span>
+          <span className="u">{cap}</span>
+        </Dial>
+        <div className="small muted">
+          {next
+            ? <>Due {fmtDate(next.dueIso, { weekday: 'short', day: 'numeric', month: 'short' })} · every {every} day{every === 1 ? '' : 's'}<br />Last {ago(last.date).toLowerCase()}, {round1(last.units)} u / {round2(last.doseMg)} mg</>
+            : 'Log your first jab to start the countdown.'}
         </div>
-        {active && status && (
-          <>
-            <div className="spread small">
-              <span>{active.peptideName || 'Vial'} · {round2(status.remainingMg)} mg left</span>
-              <span className="muted">{status.jabsLeft ?? '—'} jabs left</span>
-            </div>
-            <div className="meter"><div style={{ width: `${status.fraction * 100}%` }} /></div>
-          </>
-        )}
         <PillButton block onClick={() => setSheet('jab')}>Log a jab <Plus /></PillButton>
       </Glass>
 
-      <Glass className="stack">
-        <div className="spread" style={{ alignItems: 'flex-end' }}>
-          <div>
-            <div className="label">Weight</div>
-            <div className="big-num">{latest ? round1(latest.kg) : '—'}<span className="muted" style={{ fontSize: 14 }}> kg</span></div>
-          </div>
-          {weights.length > 1 && (
-            <div style={{ fontSize: 15, fontWeight: 500 }}>{change > 0 ? '+' : change < 0 ? '−' : ''}{round1(Math.abs(change))} kg</div>
-          )}
-        </div>
-        {weights.length > 1 && <div className="chart"><Chart weights={weights} compact /></div>}
-        <PillButton block variant="ghost" onClick={() => setSheet('weight')}>Log weight <Plus /></PillButton>
-      </Glass>
+      <div className="tiles">
+        <button type="button" className="glass tile" onClick={() => setSheet('weight')}>
+          <span className="label">Weight</span>
+          <span className="v">{latest ? round1(latest.kg) : '—'}<small> kg</small></span>
+          {weights.length > 1 && <span className="small muted">{change > 0 ? '+' : change < 0 ? '−' : ''}{round1(Math.abs(change))} kg overall</span>}
+          <span className="foot">Log weight <Plus /></span>
+        </button>
+        {active && status ? (
+          <button type="button" className="glass tile" onClick={() => go('jabs')}>
+            <span className="label">{active.peptideName || 'Vial'}</span>
+            <span className="v">{round2(status.remainingMg)}<small> mg left</small></span>
+            <span className="meter"><span style={{ width: `${status.fraction * 100}%` }} /></span>
+            <span className="foot">{status.jabsLeft ?? '—'} jabs left <ChevronR /></span>
+          </button>
+        ) : (
+          <button type="button" className="glass tile" onClick={() => go('calc')}>
+            <span className="label">Vial</span>
+            <span className="v">None</span>
+            <span className="small muted">Work out a mix and save it</span>
+            <span className="foot">Calculator <ChevronR /></span>
+          </button>
+        )}
+      </div>
 
       <button type="button" className="glass list-pill" onClick={() => go('calc')}>
         <span className="ico"><CalcIcon /></span>
@@ -106,6 +111,6 @@ export function Home({ go, openSettings }: { go: (t: Tab) => void; openSettings:
 
       {sheet === 'jab' && <JabSheet active={active} vials={vials} onClose={() => setSheet(null)} />}
       {sheet === 'weight' && <WeightSheet lastKg={latest?.kg} onClose={() => setSheet(null)} />}
-    </>
+    </div>
   );
 }
