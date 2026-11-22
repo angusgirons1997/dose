@@ -19,12 +19,6 @@ export function App() {
 
   useEffect(installClickSounds, []);
   useEffect(() => setSoundEnabled(sound), [sound]);
-  useEffect(() => {
-    const root = document.documentElement;
-    root.dataset.tab = tab;
-    root.style.setProperty('--tab-i', String(index));
-  }, [tab, index]);
-
   const screens: Record<Tab, React.ReactNode> = {
     home: <Home go={setTab} />,
     calc: <Calculator />,
@@ -33,10 +27,13 @@ export function App() {
   };
 
   return (
-    <>
+    <div id="app" className="app" style={{ '--tab-i': index } as React.CSSProperties}>
+      {/* One pre-painted layer per tab; switching only fades opacity and slides (GPU-only, no repaint) */}
       <div className="bg" aria-hidden="true">
         <div className="shift">
-          <div className="blob b1" /><div className="blob b2" /><div className="blob b3" /><div className="blob b4" />
+          <div className="drift">
+            {TABS.map(({ id }) => <div key={id} className={`layer l-${id} ${id === tab ? 'on' : ''}`} />)}
+          </div>
         </div>
         <div className="noise" />
       </div>
@@ -53,7 +50,7 @@ export function App() {
       </header>
 
       {/* All tabs sit side by side; the track slides. Off-screen panels are inert. */}
-      <div className="track" style={{ transform: `translateX(${-index * 100}%)` }}>
+      <div className="track" style={{ transform: `translate3d(${-index * 100}%, 0, 0)` }}>
         {TABS.map(({ id }) => (
           <main key={id} className="panel" inert={id !== tab}>
             <div className="screen">{screens[id]}</div>
@@ -67,6 +64,6 @@ export function App() {
       </div>
       <TabBar tab={tab} onChange={setTab} />
       {settings && <Settings onClose={() => setSettings(false)} />}
-    </>
+    </div>
   );
 }

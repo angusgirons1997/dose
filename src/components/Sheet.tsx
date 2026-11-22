@@ -27,6 +27,6 @@ export function Sheet({ title, onClose, children }: { title: string; onClose: ()
         <div className="stack">{children}</div>
       </div>
     </>,
-    document.body,
+    document.getElementById('app') ?? document.body, // inside the app box so iOS positions it correctly
   );
 }

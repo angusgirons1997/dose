@@ -12,6 +12,14 @@ Calls made while building without asking.
 - **Click sounds are made in code** (Web Audio, no sound files). There's a tick for buttons, a rising tone for tab switches and a two-note chime for saves. On iOS 17+ they follow the silent switch (`audioSession.type = 'ambient'`), and there's an on/off switch in Settings.
 - **New icon**: the same warm gradient, with a frosted glass disc and a cream droplet with a highlight. The in-app logo, favicon and PNG icons all use the same shape.
 
+## Round 3: speed and nav bar position (from your screen recording)
+- **The nav bar sat too high** because iOS home-screen apps with a black-translucent status bar measure `100%` / `inset: 0` as the screen minus the status bar. That left a strip at the bottom. Everything now lives in one `.app` box that is `100vh` tall when installed (`100dvh` in a normal browser tab). The nav bar, fade and sheets are positioned inside that box instead of with `position: fixed`, and only `html` clips overflow.
+- **The slide was choppy** because every frame re-blurred every glass card on four pages and repainted huge blurred background blobs with animating colours. Now:
+  - Cards use a translucent frosted gradient instead of a live blur. The only live blurs left are the tab bar and open sheets.
+  - The background is one pre-painted layer per tab. Switching tabs only fades opacity and moves layers, which the GPU does without repainting. There's no CSS `filter` anywhere.
+  - The noise grain no longer uses `mix-blend-mode`.
+  - The header and nav fades are plain gradients.
+
 ## Calculator
 - **Check mode only.** The plan / water-to-add mode is gone from the screen. `plan()` and its spec tests stay in `calc.ts`, since the spec still covers them.
 - **The result and the inputs are one card**: units, the working, the syringe bar and the strength / full doses / leftover, then vial, water and dose (with quick-pick chips) and an optional peptide name.
