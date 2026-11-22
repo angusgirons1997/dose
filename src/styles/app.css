@@ -35,34 +35,99 @@ input:focus-visible, button:focus-visible, select:focus-visible { outline: 2px s
 .bg .drift { position: absolute; inset: 0; animation: drift 60s ease-in-out infinite alternate; }
 .bg .layer { position: absolute; inset: 0; opacity: 0; transition: opacity var(--slide); }
 .bg .layer.on { opacity: 1; }
+/* Each tab: a base wash, plus two floating colour sets (::before / ::after) that drift, turn and
+   breathe on different, non-matching cycles so the field never repeats the same way. Transform-only
+   animation on pre-painted layers, so it stays cheap; hidden tabs pause theirs. */
+.bg .layer::before, .bg .layer::after { content: ''; position: absolute; inset: -25%; will-change: transform; }
+.bg .layer::before { animation: float-a 23s ease-in-out infinite alternate; }
+.bg .layer::after { animation: float-b 31s ease-in-out infinite alternate; }
+.bg .layer:not(.on)::before, .bg .layer:not(.on)::after { animation-play-state: paused; }
+@keyframes float-a {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+  35% { transform: translate3d(9%, -6%, 0) rotate(18deg) scale(1.12); }
+  70% { transform: translate3d(-4%, 7%, 0) rotate(-10deg) scale(0.95); }
+  100% { transform: translate3d(6%, 10%, 0) rotate(28deg) scale(1.08); }
+}
+@keyframes float-b {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1.05); }
+  40% { transform: translate3d(-10%, 6%, 0) rotate(-22deg) scale(0.92); }
+  100% { transform: translate3d(7%, -9%, 0) rotate(14deg) scale(1.15); }
+}
+
+/* Home: dusk — coral, rose and violet over plum */
 .l-home {
   background:
-    radial-gradient(70% 55% at 12% 12%, #8c4a32, transparent 75%),
-    radial-gradient(60% 60% at 60% 35%, #c98a3e, transparent 75%),
-    radial-gradient(70% 55% at 15% 85%, #7e93a8, transparent 75%),
-    radial-gradient(60% 50% at 70% 90%, #8c4a32, transparent 75%),
-    #3a2219;
+    radial-gradient(60% 45% at 80% 8%, #ffb07a, transparent 70%),
+    radial-gradient(70% 55% at 10% 40%, #b03a63, transparent 72%),
+    radial-gradient(70% 50% at 70% 95%, #4b3a9c, transparent 72%),
+    #2a1230;
 }
+.l-home::before {
+  background:
+    radial-gradient(35% 28% at 30% 30%, #ff6f61, transparent 70%),
+    radial-gradient(30% 25% at 75% 60%, #e05a8c, transparent 70%);
+}
+.l-home::after {
+  background:
+    radial-gradient(32% 26% at 60% 25%, #ffcf8a, transparent 70%),
+    radial-gradient(38% 30% at 25% 75%, #7a4fd0, transparent 70%);
+}
+
+/* Calculator: amber and terracotta with a cold slate glint */
 .l-calc {
   background:
-    radial-gradient(70% 55% at 20% 15%, #9a5236, transparent 75%),
-    radial-gradient(60% 60% at 65% 50%, #c98a3e, transparent 75%),
-    radial-gradient(70% 55% at 25% 90%, #7e93a8, transparent 75%),
-    #3a2219;
+    radial-gradient(70% 55% at 15% 10%, #b0482b, transparent 75%),
+    radial-gradient(60% 50% at 80% 55%, #e09a3f, transparent 72%),
+    radial-gradient(70% 55% at 20% 95%, #5a7fa8, transparent 72%),
+    #2e1810;
 }
+.l-calc::before {
+  background:
+    radial-gradient(34% 28% at 65% 25%, #f4b860, transparent 70%),
+    radial-gradient(30% 24% at 25% 60%, #d0613a, transparent 70%);
+}
+.l-calc::after {
+  background:
+    radial-gradient(30% 26% at 70% 80%, #8fb1d6, transparent 70%),
+    radial-gradient(36% 28% at 35% 35%, #9a3a22, transparent 70%);
+}
+
+/* Jabs: berry, cherry and a warm apricot flare */
 .l-jabs {
   background:
-    radial-gradient(70% 55% at 15% 15%, #5a1e22, transparent 75%),
-    radial-gradient(60% 60% at 60% 40%, #b5525a, transparent 75%),
-    radial-gradient(70% 55% at 20% 90%, #3b2033, transparent 75%),
-    #2a1216;
+    radial-gradient(70% 55% at 15% 15%, #6a1838, transparent 75%),
+    radial-gradient(60% 55% at 70% 45%, #d0435f, transparent 72%),
+    radial-gradient(70% 55% at 25% 95%, #43205a, transparent 72%),
+    #1f0a16;
 }
+.l-jabs::before {
+  background:
+    radial-gradient(32% 26% at 70% 25%, #ff8a7a, transparent 70%),
+    radial-gradient(34% 28% at 30% 65%, #a0245a, transparent 70%);
+}
+.l-jabs::after {
+  background:
+    radial-gradient(28% 22% at 40% 30%, #f2a35e, transparent 70%),
+    radial-gradient(36% 30% at 75% 80%, #6c2a8a, transparent 70%);
+}
+
+/* Body: deep teal and sea glass with a sand-gold warmth */
 .l-body {
   background:
-    radial-gradient(70% 55% at 15% 15%, #1e3b40, transparent 75%),
-    radial-gradient(60% 60% at 60% 40%, #4a5f6b, transparent 75%),
-    radial-gradient(70% 55% at 25% 90%, #b89a74, transparent 75%),
-    #152427;
+    radial-gradient(70% 55% at 15% 15%, #135a5e, transparent 75%),
+    radial-gradient(60% 55% at 75% 45%, #3f7f95, transparent 72%),
+    radial-gradient(70% 55% at 25% 95%, #c79a5e, transparent 72%),
+    #0b1b20;
+}
+.l-body::before {
+  background:
+    radial-gradient(34% 26% at 65% 30%, #6cc3be, transparent 70%),
+    radial-gradient(30% 24% at 25% 55%, #1d6f86, transparent 70%);
+}
+.l-body::after {
+  background:
+    radial-gradient(30% 24% at 35% 75%, #e8c084, transparent 70%),
+    radial-gradient(36% 28% at 75% 20%, #2b4f8a, transparent 70%);
 }
 .bg .noise {
   position: absolute; inset: 0; opacity: 0.05;
@@ -74,7 +139,7 @@ input:focus-visible, button:focus-visible, select:focus-visible { outline: 2px s
   100% { transform: translate3d(-3vw, 5vh, 0) scale(1); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .bg .drift { animation: none; } /* the tab slide stays: it's short and user-initiated */
+  .bg .drift, .bg .layer::before, .bg .layer::after { animation: none; } /* the tab slide stays: it's short and user-initiated */
 }
 
 /* ---------- layout ---------- */

@@ -76,3 +76,8 @@ Calls made while building without asking.
 - **Clear glass** (reference: a near-transparent card on a cloud photo): card fill is almost nothing; the shape comes from a 1.5px specular rim, bright at top-left and bottom-right corners. Buttons and chips get the same rim with a faint warm-dark tint.
 - **Parallax shine:** a second highlight layer in the rim slides along the edge as each card scrolls, using a CSS scroll-driven animation (`animation-timeline: view()`). Where that isn't supported (older iOS) the rim is just static.
 - **Type scaled down and lightened:** title 26/600, big numbers 30/500, calculator hero 52/500, buttons 14/500 at 44px tall, labels 12px. Inputs stay 16px+ so iOS doesn't zoom on focus.
+
+## Round 7: vertical marks icon, livelier backgrounds
+- **Icon:** eight vertical syringe graduations on one baseline: two tall marks in the centre, shorter ones either side (10/14/10 units, centre 28). Same flat #B0573A.
+- **Home has its own palette** (dusk: coral, rose, violet over plum); it used to share Calculator's.
+- **Backgrounds move:** each tab has a base wash plus two floating colour sets (`::before` / `::after`) that drift, rotate and scale on 23s and 31s cycles that don't line up, so the field keeps changing. Transform-only on pre-painted layers; the hidden tabs' animations are paused and reduced-motion stops them.

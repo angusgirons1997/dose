@@ -1,6 +1,6 @@
 // Generates the PWA / apple-touch icons as PNGs with no dependencies. Run: node scripts/make-icons.mjs
-// Design (64-unit grid, matches public/favicon.svg): "measure marks" — three white rounded bars,
-// shortening and fading like syringe graduations, on one flat terracotta colour (no gradient).
+// Design (64-unit grid, matches public/favicon.svg): "measure marks" — vertical syringe graduations
+// in white on one flat terracotta colour (no gradient).
 import { writeFileSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
 
@@ -20,16 +20,19 @@ const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
 
 const BG = [176, 87, 58]; // #B0573A
 const WHITE = [255, 255, 255];
-// [x, y, width, opacity]; all bars 5.8 tall, fully rounded ends
-const BARS = [[15.1, 18.6, 33.7, 1], [15.1, 29.1, 23.3, 0.75], [15.1, 39.6, 14, 0.5]];
-const H = 5.8;
-const inBar = (x, y, [bx, by, w]) => {
-  const r = H / 2, cy = by + r;
-  const cx = Math.min(Math.max(x, bx + r), bx + w - r);
+// Eight vertical graduation marks standing on one baseline, like a syringe scale: two tall marks
+// in the centre, shorter ones either side. [x, height, opacity]; all 2.8 wide with rounded ends.
+const W = 2.8, GAP = 3.2, BASE = 46;
+const HEIGHTS = [10, 14, 10, 28, 28, 10, 14, 10];
+const X0 = 32 - (HEIGHTS.length * W + (HEIGHTS.length - 1) * GAP) / 2;
+const BARS = HEIGHTS.map((h, i) => [X0 + i * (W + GAP), h, 1]);
+const inBar = (x, y, [bx, h]) => {
+  const r = W / 2, cx = bx + r;
+  const cy = Math.min(Math.max(y, BASE - h + r), BASE - r);
   return Math.hypot(x - cx, y - cy) <= r;
 };
 function shade(x, y) {
-  for (const b of BARS) if (inBar(x, y, b)) return mix(BG, WHITE, b[3]);
+  for (const b of BARS) if (inBar(x, y, b)) return mix(BG, WHITE, b[2]);
   return BG;
 }
 
