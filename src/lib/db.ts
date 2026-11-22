@@ -82,6 +82,15 @@ export function useSetting<T>(key: string, fallback: T): T {
 }
 export const usePrefs = () => ({ ...defaultPrefs, ...useSetting<Partial<Prefs>>('prefs', {}) });
 
+/** Days between jabs, per peptide (keyed by lower-case name). Unset peptides use 7 (weekly, e.g. Reta). */
+export const DEFAULT_PEPTIDE = 'Reta';
+export const DEFAULT_INTERVAL = 7;
+const peptideKey = (name?: string) => (name?.trim() || DEFAULT_PEPTIDE).toLowerCase();
+export const useIntervals = () => useSetting<Record<string, number>>('intervals', {});
+export const intervalFor = (intervals: Record<string, number>, name?: string) => intervals[peptideKey(name)] ?? DEFAULT_INTERVAL;
+export const saveInterval = (intervals: Record<string, number>, name: string, days: number) =>
+  setSetting('intervals', { ...intervals, [peptideKey(name)]: days });
+
 // ---------- vials / jabs ----------
 export const getActiveVial = async () => (await db.vials.toArray()).find((v) => v.active);
 

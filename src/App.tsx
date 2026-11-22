@@ -1,7 +1,4 @@
 import { useEffect, useState } from 'react';
-import { IconButton } from './components/Glass';
-import { GearIcon } from './components/Icons';
-import { Logo } from './components/Logo';
 import { TABS, TabBar, type Tab } from './components/TabBar';
 import { useSetting } from './lib/db';
 import { installClickSounds, setHapticsEnabled, setSoundEnabled } from './lib/sound';
@@ -22,7 +19,7 @@ export function App() {
   useEffect(() => setSoundEnabled(sound), [sound]);
   useEffect(() => setHapticsEnabled(haptics), [haptics]);
   const screens: Record<Tab, React.ReactNode> = {
-    home: <Home go={setTab} />,
+    home: <Home go={setTab} openSettings={() => setSettings(true)} />,
     calc: <Calculator />,
     jabs: <Jabs />,
     body: <Body />,
@@ -40,17 +37,6 @@ export function App() {
         <div className="noise" />
       </div>
 
-      <header className="app-header">
-        <button type="button" className="brand" onClick={() => setTab('home')} aria-label="Dose — home">
-          <Logo size={38} />
-          <span>
-            <b>Dose</b>
-            <span className="label">{new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}</span>
-          </span>
-        </button>
-        <IconButton label="Settings" onClick={() => setSettings(true)}><GearIcon /></IconButton>
-      </header>
-
       {/* All tabs sit side by side; the track slides. Off-screen panels are inert. */}
       <div className="track" style={{ transform: `translate3d(${-index * 100}%, 0, 0)` }}>
         {TABS.map(({ id }) => (
@@ -60,10 +46,9 @@ export function App() {
         ))}
       </div>
 
-      {/* Fades content under the nav and swallows taps there */}
-      <div className="nav-shield">
-        {tab === 'calc' && <p className="disclaimer">Calculator only — not medical advice. Check your maths.</p>}
-      </div>
+      {/* Blurs content under the nav (iOS scroll-edge effect) and swallows taps there */}
+      <div className="nav-shield" />
+      {tab === 'calc' && <p className="disclaimer">Calculator only — not medical advice. Check your maths.</p>}
       <TabBar tab={tab} onChange={setTab} />
       {settings && <Settings onClose={() => setSettings(false)} />}
     </div>

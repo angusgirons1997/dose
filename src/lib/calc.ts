@@ -164,3 +164,13 @@ function describeDraws(draws: number[]): string {
 // ---------- Rounding ----------
 export const round1 = (x: number): number => Math.round((x + Number.EPSILON) * 10) / 10;
 export const round2 = (x: number): number => Math.round((x + Number.EPSILON) * 100) / 100;
+
+/** Days from `todayIso` to the next jab (`lastIso` + interval). Negative = overdue. Dates are YYYY-MM-DD. */
+export function nextJab(lastIso: string, todayIso: string, intervalDays: number) {
+  const day = (iso: string) => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) / 864e5;
+  const due = day(lastIso) + intervalDays;
+  const d = new Date(due * 864e5);
+  const dueIso = d.toISOString().slice(0, 10);
+  const daysLeft = due - day(todayIso);
+  return { dueIso, daysLeft, fraction: Math.min(1, Math.max(0, 1 - daysLeft / intervalDays)) };
+}

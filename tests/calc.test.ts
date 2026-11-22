@@ -4,6 +4,7 @@ import {
   check,
   fillFraction,
   markSpacing,
+  nextJab,
   offMark,
   plan,
   round1,
@@ -212,5 +213,19 @@ describe('rounding', () => {
     expect(round1(1.05)).toBe(1.1);
     expect(round2(1.005)).toBe(1.01);
     expect(round2(0.1 + 0.2)).toBe(0.3);
+  });
+});
+
+describe('nextJab', () => {
+  it('counts down a 7-day interval', () => {
+    expect(nextJab('2026-11-20', '2026-11-22', 7)).toEqual({ dueIso: '2026-11-27', daysLeft: 5, fraction: 2 / 7 });
+  });
+  it('is due today and goes negative when overdue', () => {
+    expect(nextJab('2026-11-15', '2026-11-22', 7).daysLeft).toBe(0);
+    expect(nextJab('2026-11-13', '2026-11-22', 7)).toMatchObject({ daysLeft: -2, fraction: 1 });
+  });
+  it('crosses month/year ends and DST without drift', () => {
+    expect(nextJab('2026-12-29', '2026-12-30', 7).dueIso).toBe('2027-01-05');
+    expect(nextJab('2026-03-26', '2026-03-28', 3).daysLeft).toBe(1);
   });
 });

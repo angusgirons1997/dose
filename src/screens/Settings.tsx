@@ -1,7 +1,9 @@
 import { useRef, useState } from 'react';
 import type { CapacityMl, SyringeType } from '../lib/calc';
 import { exportBackup, importBackup } from '../lib/backup';
-import { setSetting, usePrefs, useSetting, type Prefs } from '../lib/db';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { DEFAULT_PEPTIDE, db, intervalFor, saveInterval, setSetting, useIntervals, usePrefs, useSetting, type Prefs } from '../lib/db';
+import { Stepper } from '../components/Stepper';
 import { Glass, Segmented, Toggle } from '../components/Glass';
 import { PillButton } from '../components/PillButton';
 import { Sheet } from '../components/Sheet';
@@ -13,6 +15,9 @@ export function Settings({ onClose }: { onClose: () => void }) {
   const persisted = useSetting<boolean | null>('persisted', null);
   const sound = useSetting('sound', true);
   const haptics = useSetting('haptics', true);
+  const intervals = useIntervals();
+  const names = useLiveQuery(() => db.vials.toArray().then((vs) => vs.map((v) => v.peptideName.trim()).filter(Boolean)), [], [] as string[]);
+  const peptides = [...new Map((names.length ? names : [DEFAULT_PEPTIDE]).map((n) => [n.toLowerCase(), n])).values()];
   const fileRef = useRef<HTMLInputElement>(null);
   const [msg, setMsg] = useState('');
   const set = (p: Partial<Prefs>) => setSetting('prefs', { ...prefs, ...p });
@@ -55,6 +60,25 @@ export function Settings({ onClose }: { onClose: () => void }) {
         <PillButton block variant="ghost" onClick={() => fileRef.current?.click()}>Import backup <Upload /></PillButton>
         <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={(e) => { doImport(e.target.files?.[0]); e.target.value = ''; }} />
         {msg && <div className="small" role="status">{msg}</div>}
+      </Glass>
+
+      <Glass className="tight stack">
+        <div>
+          <b style={{ fontSize: 17 }}>Jab schedule</b>
+          <p className="small muted" style={{ margin: '4px 0 0' }}>Days between jabs, used for the countdown on Home.</p>
+        </div>
+        {peptides.map((name) => (
+          <Stepper
+            key={name}
+            label={name}
+            value={intervalFor(intervals, name)}
+            onChange={(d) => { if (Number.isInteger(d) && d >= 1) saveInterval(intervals, name, d); }}
+            step={1}
+            min={1}
+            unit="days"
+            chips={[1, 3, 7, 14]}
+          />
+        ))}
       </Glass>
 
       <Glass className="tight stack">

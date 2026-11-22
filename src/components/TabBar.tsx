@@ -12,6 +12,7 @@ export type Tab = (typeof TABS)[number]['id'];
 export function TabBar({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
   return (
     <nav className="glass tabbar" aria-label="Tabs">
+      <span className="lens" aria-hidden="true" />
       {TABS.map(({ id, label, Icon }) => (
         <button key={id} type="button" data-sound="tab" aria-current={tab === id ? 'page' : undefined} onClick={() => onChange(id)}>
           <Icon />
