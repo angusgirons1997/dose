@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import type { CapacityMl, SyringeType } from '../lib/calc';
 import { exportBackup, importBackup } from '../lib/backup';
 import { setSetting, usePrefs, useSetting, type Prefs } from '../lib/db';
-import { Glass, Segmented } from '../components/Glass';
+import { Glass, Segmented, Toggle } from '../components/Glass';
 import { PillButton } from '../components/PillButton';
 import { Sheet } from '../components/Sheet';
 import { Download, Upload } from '../components/Icons';
@@ -11,6 +11,7 @@ export function Settings({ onClose }: { onClose: () => void }) {
   const prefs = usePrefs();
   const lastBackup = useSetting<string | null>('lastBackup', null);
   const persisted = useSetting<boolean | null>('persisted', null);
+  const sound = useSetting('sound', true);
   const fileRef = useRef<HTMLInputElement>(null);
   const [msg, setMsg] = useState('');
   const set = (p: Partial<Prefs>) => setSetting('prefs', { ...prefs, ...p });
@@ -59,6 +60,10 @@ export function Settings({ onClose }: { onClose: () => void }) {
         <b style={{ fontSize: 17 }}>Syringe defaults</b>
         <Segmented<SyringeType> label="Syringe type" value={prefs.syringeType} onChange={(syringeType) => set({ syringeType })} options={[{ value: 'U-100', label: 'U-100' }, { value: 'U-40', label: 'U-40' }]} />
         <Segmented<CapacityMl> label="Capacity" value={prefs.capacityMl} onChange={(capacityMl) => set({ capacityMl })} options={[{ value: 0.3, label: '0.3 mL' }, { value: 0.5, label: '0.5 mL' }, { value: 1, label: '1 mL' }]} />
+      </Glass>
+
+      <Glass className="tight">
+        <Toggle label="Sounds" checked={sound} onChange={(v) => setSetting('sound', v)} />
       </Glass>
 
       <Glass className="tight small muted stack" style={{ gap: 6 }}>

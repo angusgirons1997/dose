@@ -2,30 +2,38 @@
 
 Calls made while building without asking.
 
+## Round 2 changes (from your feedback)
+- **The app opens on a new Home tab.** It shows the last jab, how much of the vial is left, your latest weight with a small graph, quick "Log a jab" / "Log weight" buttons and a link to the calculator. It always opens on Home, even if you were on another tab before.
+- **The Dose logo and name are fixed at the top left**, with the date underneath. Tapping it takes you to Home. The settings gear stays top right.
+- **The tabs are Home, Calculator, Jabs and Body.** All four pages sit side by side and slide left or right when you switch. The background colours fade between tab palettes as you slide, and the blobs move slightly behind the page. Pages you can't see are `inert` (not tappable or focusable).
+- **With iOS Reduce Motion on**, only the slow background drift stops. The tab slide still plays, because you asked for it.
+- **There's a fade behind the nav bar**: a gradient and blur that sits above the content and blocks taps, so nothing under or around the nav bar can be pressed.
+- **Glass surfaces have no border now.** Depth comes from a soft shadow and a faint top highlight only.
+- **Click sounds are made in code** (Web Audio, no sound files). There's a tick for buttons, a rising tone for tab switches and a two-note chime for saves. On iOS 17+ they follow the silent switch (`audioSession.type = 'ambient'`), and there's an on/off switch in Settings.
+- **New icon**: the same warm gradient, with a frosted glass disc and a cream droplet with a highlight. The in-app logo, favicon and PNG icons all use the same shape.
+
 ## Calculator
-- **Result card sits above the inputs** (one hero per screen, like image 01). Steps sit below the inputs.
-- **The doses-per-vial line is split into two stats**, "Doses per vial: 2 full" and "Leftover: 1 mg (20 u)", so it fits the 2-column grid. The maths is the same as the spec.
-- **Syringe type, capacity and BAC bottle size** can be changed on the calculator and in Settings. Both write the same `prefs` setting.
-- **U-40 syringes are assumed to be marked every 1 unit.** U-100 1 mL is marked every 2 units; 0.3 and 0.5 mL every 1 unit, as in CLAUDE.md.
-- **The off-mark warning** ("falls between marks") is one of the amber warnings. It doesn't block anything.
-- **Invalid input** (empty, 0 or negative) makes `plan`/`check` return `null`, and the card asks for numbers above zero.
-- **Calculator inputs are remembered** in the `settings` table (`calc` key), including the peptide name.
-- **"Save as my vial"** stores `settings.savedVial` (peptide, vial mg, water, dose, concentration, syringe). It does not create a vial row by itself. The vial is created when you log a jab with "Reconstituted a new vial today" switched on, which matches the data-model rule in CLAUDE.md.
-- **The disclaimer** is a small fixed pill above the tab bar, so it's always visible on the Calculator tab.
+- **Check mode only.** The plan / water-to-add mode is gone from the screen. `plan()` and its spec tests stay in `calc.ts`, since the spec still covers them.
+- **The result and the inputs are one card**: units, the working, the syringe bar and the strength / full doses / leftover, then vial, water and dose (with quick-pick chips) and an optional peptide name.
+- **The syringe card and BAC bottle setting are gone.** Syringe type and capacity are now only in Settings. The default is U-100, 1 mL.
+- **U-40 syringes are assumed to be marked every 1 unit.** U-100 1 mL is marked every 2 units, and 0.3 / 0.5 mL every 1 unit.
+- **Warnings show amber inside the card.** They never block anything. The "between marks" warning is one of them.
+- **"Save as my vial"** stores `settings.savedVial`. The vial itself is created when you log a jab with "Reconstituted a new vial today" switched on.
+- **The disclaimer** sits just above the nav bar on the Calculator tab.
 
 ## Jabs
-- **One jab per day.** Tapping a day that already has a jab edits it. The data model allows more than one, but the calendar shows the first.
-- **The new-vial toggle defaults to on** when there's no active vial. Its vial mg / water fields are prefilled from `savedVial` and can be edited, which covers "or prompts for them".
-- **Units prefill** from the saved plan. **Dose (mg)** is worked out from the vial's concentration until you edit it; a chip lets you go back to the worked-out value.
-- **The vial is only created when a jab is first saved.** Editing a jab later never makes or changes vials. Deleting a new-vial jab leaves the vial in place.
-- **`vials.doseMg` (optional) was added** to the data model so "jabs left" has a planned dose. Without it, the app uses the last jab's dose.
-- **The calendar starts on Monday.**
+- **It's a list now, not a calendar**: jabs grouped by month, newest first. Tap one to edit or delete it. A ring icon marks a new-vial jab. The active vial card is at the top.
+- **You can log more than one jab a day.**
+- **The new-vial toggle is on by default** when there's no active vial. Its fields are prefilled from `savedVial` and can be edited.
+- **Units are prefilled** from the saved vial. **Dose (mg)** is worked out from the vial's strength until you edit it; a chip puts the worked-out value back.
+- **The vial is created when the jab is first saved.** Editing a jab never changes vials.
+- **`vials.doseMg` (optional) was added** so "jabs left" knows the planned dose.
 
 ## Body
 - **Weight is required on every entry. The photo is optional.** A photo is always attached to a weight entry.
 - **There are two photo buttons, Camera and Library.** On iOS, `capture` forces the camera, so the spec's single input would block the library.
 - **Compare:** tap "Compare", pick any two photos, and they open side by side, oldest on the left.
-- **The chart's x-axis is real dates**, so gaps show as gaps. It's padded to at least a 1 kg range so a flat line stays readable.
+- **The weight graph is the first thing on the page**, with kg gridlines and the first and last dates. It always shows: an empty frame before you've logged anything, then a single dot. The x-axis is real dates, and the y-axis covers at least 2 kg so a flat line stays readable.
 
 ## Data / backup
 - **Export uses the iOS share sheet** (`navigator.share` with a file), so you can choose "Save to Files". It falls back to a download where share isn't available. Cancelling the share sheet doesn't count as a backup.

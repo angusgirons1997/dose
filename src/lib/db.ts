@@ -68,9 +68,8 @@ export interface SavedVial {
 export interface Prefs {
   syringeType: SyringeType;
   capacityMl: CapacityMl;
-  bottleMl: number;
 }
-export const defaultPrefs: Prefs = { syringeType: 'U-100', capacityMl: 1, bottleMl: 3 };
+export const defaultPrefs: Prefs = { syringeType: 'U-100', capacityMl: 1 };
 
 export async function getSetting<T>(key: string, fallback: T): Promise<T> {
   const row = await db.settings.get(key);
@@ -138,5 +137,6 @@ export async function deleteWeight(w: Weight) {
 const pad = (n: number) => String(n).padStart(2, '0');
 export const isoDate = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 export const today = () => isoDate(new Date());
-export const fmtDate = (iso: string, opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }) =>
+export const daysAgo = (iso: string) => Math.round((Date.parse(today() + 'T00:00') - Date.parse(iso + 'T00:00')) / 864e5);
+export const fmtDate =(iso: string, opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }) =>
   new Date(iso + 'T00:00').toLocaleDateString(undefined, opts);

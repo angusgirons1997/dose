@@ -1,9 +1,15 @@
+/* Registered so the palette animates when the tab changes */
+@property --c1 { syntax: '<color>'; inherits: true; initial-value: #8c4a32; }
+@property --c2 { syntax: '<color>'; inherits: true; initial-value: #c98a3e; }
+@property --c3 { syntax: '<color>'; inherits: true; initial-value: #7e93a8; }
+@property --base { syntax: '<color>'; inherits: true; initial-value: #3a2219; }
+
 :root {
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-bg-strong: rgba(255, 255, 255, 0.16);
-  --glass-border: rgba(255, 255, 255, 0.22);
-  --glass-blur: blur(28px) saturate(140%);
-  --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  --glass-bg: rgba(255, 255, 255, 0.11);
+  --glass-bg-strong: rgba(255, 255, 255, 0.17);
+  --glass-blur: blur(28px) saturate(150%);
+  --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  --hairline: rgba(255, 255, 255, 0.14);
   --radius-card: 32px;
   --radius-pill: 999px;
   --cream: #fbf3c4;
@@ -16,26 +22,20 @@
 
   --font: -apple-system, 'SF Pro Display', 'Inter', system-ui, sans-serif;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --slide: 0.5s cubic-bezier(0.32, 0.72, 0, 1); /* iOS-style page slide */
 
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --tabbar-h: 68px;
+  --tabbar-h: 66px;
+  --header-h: 64px;
 
   /* palette per tab, set on <html data-tab> */
   --c1: #8c4a32;
   --c2: #c98a3e;
   --c3: #7e93a8;
   --base: #3a2219;
+  transition: --c1 var(--slide), --c2 var(--slide), --c3 var(--slide), --base var(--slide);
 }
-[data-tab='jabs'] {
-  --c1: #5a1e22;
-  --c2: #b5525a;
-  --c3: #3b2033;
-  --base: #2a1216;
-}
-[data-tab='body'] {
-  --c1: #1e3b40;
-  --c2: #4a5f6b;
-  --c3: #b89a74;
-  --base: #152427;
-}
+[data-tab='calc'] { --c1: #9a5236; --c2: #c98a3e; --c3: #7e93a8; --base: #3a2219; }
+[data-tab='jabs'] { --c1: #5a1e22; --c2: #b5525a; --c3: #3b2033; --base: #2a1216; }
+[data-tab='body'] { --c1: #1e3b40; --c2: #4a5f6b; --c3: #b89a74; --base: #152427; }

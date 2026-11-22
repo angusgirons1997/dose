@@ -1,93 +1,67 @@
 import { useEffect, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { check, round1, round2, unitsToMg, vialRemaining } from '../lib/calc';
-import { db, fmtDate, isoDate, saveJab, today, usePrefs, useSetting, type Jab, type SavedVial, type Vial } from '../lib/db';
-import { Glass, IconButton, Toggle } from '../components/Glass';
+import { db, fmtDate, saveJab, today, usePrefs, useSetting, type Jab, type SavedVial, type Vial } from '../lib/db';
+import { Glass, Toggle } from '../components/Glass';
 import { PillButton } from '../components/PillButton';
 import { Sheet } from '../components/Sheet';
 import { Stepper } from '../components/Stepper';
-import { ChevronL, ChevronR, Plus, SyringeIcon, Vial as VialIcon } from '../components/Icons';
+import { Plus, SyringeIcon, Vial as VialIcon } from '../components/Icons';
 
-const DOW = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-
-export function Jabs() {
+export const useJabData = () => {
   const jabs = useLiveQuery(() => db.jabs.orderBy('date').reverse().toArray(), [], []);
   const vials = useLiveQuery(() => db.vials.toArray(), [], []);
-  const [month, setMonth] = useState(() => {
-    const n = new Date();
-    return new Date(n.getFullYear(), n.getMonth(), 1);
-  });
-  const [editing, setEditing] = useState<{ date: string; jab?: Jab } | null>(null);
+  return { jabs, vials, active: vials.find((v) => v.active) };
+};
 
-  const byDate = new Map<string, Jab>();
-  for (const j of jabs) if (!byDate.has(j.date)) byDate.set(j.date, j);
+export function vialStatus(vial: Vial, jabs: Jab[]) {
+  const used = jabs.filter((j) => j.vialId === vial.id);
+  const dose = vial.doseMg ?? used[0]?.doseMg;
+  return { used, dose, ...vialRemaining(vial.vialMg, used.map((j) => j.doseMg), dose) };
+}
 
-  const active = vials.find((v) => v.active);
-  const t = today();
+export function Jabs() {
+  const { jabs, vials, active } = useJabData();
+  const [editing, setEditing] = useState<Jab | 'new' | null>(null);
 
-  // Monday-first grid
-  const lead = (month.getDay() + 6) % 7;
-  const daysIn = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
-  const cells = Array.from({ length: lead + daysIn }, (_, i) => (i < lead ? null : isoDate(new Date(month.getFullYear(), month.getMonth(), i - lead + 1))));
-  const shift = (n: number) => setMonth(new Date(month.getFullYear(), month.getMonth() + n, 1));
+  // group by month, newest first
+  const months = new Map<string, Jab[]>();
+  for (const j of jabs) {
+    const k = j.date.slice(0, 7);
+    months.set(k, [...(months.get(k) ?? []), j]);
+  }
 
   return (
     <>
       <h1 className="title">Jabs</h1>
 
-      <Glass>
-        <div className="spread" style={{ marginBottom: 14 }}>
-          <IconButton label="Previous month" onClick={() => shift(-1)}><ChevronL /></IconButton>
-          <b style={{ fontSize: 18 }}>{month.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</b>
-          <IconButton label="Next month" onClick={() => shift(1)}><ChevronR /></IconButton>
-        </div>
-        <div className="cal-head">{DOW.map((d, i) => <span key={i}>{d}</span>)}</div>
-        <div className="cal">
-          {cells.map((iso, i) => {
-            if (!iso) return <span key={i} className="day out" />;
-            const j = byDate.get(iso);
-            const cls = ['day', j && 'jab', jabs.some((x) => x.date === iso && x.newVial) && 'vial', iso === t && 'today', iso > t && 'future'].filter(Boolean).join(' ');
-            return (
-              <button
-                key={iso}
-                type="button"
-                className={cls}
-                aria-label={`${fmtDate(iso, { weekday: 'long', day: 'numeric', month: 'long' })}${j ? `, ${round1(j.units)} units` : ''}`}
-                onClick={() => setEditing({ date: iso, jab: j })}
-              >
-                {Number(iso.slice(8))}
-              </button>
-            );
-          })}
-        </div>
-        <div className="legend">
-          <span><i style={{ background: 'var(--cream)' }} /> Jab</span>
-          <span><i style={{ border: '2px solid var(--cream)' }} /> New vial</span>
-        </div>
-      </Glass>
-
-      <PillButton block onClick={() => setEditing({ date: t, jab: byDate.get(t) })}>
-        Log today’s jab <Plus />
-      </PillButton>
-
-      {jabs.length > 0 && (
-        <>
-          <div className="section-title">Recent</div>
-          <div className="pills-scroll">
-            {jabs.slice(0, 5).map((j) => (
-              <button key={j.id} type="button" className="glass jab-pill" onClick={() => setEditing({ date: j.date, jab: j })}>
-                <b>{round1(j.units)} u</b>
-                <span>{fmtDate(j.date)} · {round2(j.doseMg)} mg</span>
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-
-      <div className="section-title">Active vial</div>
       <ActiveVial vial={active} jabs={jabs} />
 
-      {editing && <JabSheet {...editing} active={active} vials={vials} onClose={() => setEditing(null)} />}
+      <PillButton block onClick={() => setEditing('new')}>
+        Log a jab <Plus />
+      </PillButton>
+
+      {jabs.length === 0 && <div className="empty">No jabs logged yet.</div>}
+      {[...months].map(([month, list]) => (
+        <section key={month} className="stack" style={{ gap: 8 }}>
+          <div className="section-title">{fmtDate(month + '-01', { month: 'long', year: 'numeric' })}</div>
+          {list.map((j) => (
+            <button key={j.id} type="button" className="glass list-pill" onClick={() => setEditing(j)}>
+              <span className={`ico ${j.newVial ? 'ring' : ''}`}>{j.newVial ? <VialIcon /> : <SyringeIcon />}</span>
+              <div>
+                <div className="t">{round1(j.units)} units</div>
+                <div className="s">
+                  {fmtDate(j.date, { weekday: 'short', day: 'numeric', month: 'short' })}
+                  {j.newVial ? ' · New vial' : ''}
+                </div>
+              </div>
+              <span className="end"><b>{round2(j.doseMg)}</b> <span className="muted small">mg</span></span>
+            </button>
+          ))}
+        </section>
+      ))}
+
+      {editing && <JabSheet jab={editing === 'new' ? undefined : editing} active={active} vials={vials} onClose={() => setEditing(null)} />}
     </>
   );
 }
@@ -99,38 +73,36 @@ function ActiveVial({ vial, jabs }: { vial?: Vial; jabs: Jab[] }) {
         <div className="empty">No active vial. Log a jab with “Reconstituted a new vial today” switched on.</div>
       </Glass>
     );
-  const used = jabs.filter((j) => j.vialId === vial.id);
-  const dose = vial.doseMg ?? used[0]?.doseMg;
-  const { remainingMg: remaining, jabsLeft: left, fraction } = vialRemaining(vial.vialMg, used.map((j) => j.doseMg), dose);
+  const { used, dose, remainingMg, jabsLeft, fraction } = vialStatus(vial, jabs);
   return (
     <Glass className="tight stack">
       <div className="list-pill" style={{ padding: 0 }}>
         <span className="ico"><VialIcon /></span>
         <div>
-          <div className="t">{vial.peptideName || 'Vial'} · {vial.vialMg} mg</div>
+          <div className="t">{vial.peptideName || 'Active vial'} · {vial.vialMg} mg</div>
           <div className="s">Mixed {fmtDate(vial.createdAt)} · {vial.waterMl} mL · {round2(vial.concentrationMgPerMl)} mg/mL</div>
         </div>
       </div>
       <div className="spread" style={{ alignItems: 'flex-end' }}>
         <div>
           <div className="label">Remaining</div>
-          <div className="big-num">{round2(remaining)}<span className="muted" style={{ fontSize: 18 }}> mg</span></div>
+          <div className="big-num">{round2(remainingMg)}<span className="muted" style={{ fontSize: 18 }}> mg</span></div>
         </div>
         <div style={{ textAlign: 'right' }}>
           <div className="label">Jabs left</div>
-          <div className="big-num">{left ?? '—'}</div>
+          <div className="big-num">{jabsLeft ?? '—'}</div>
         </div>
       </div>
       <div className="meter"><div style={{ width: `${fraction * 100}%` }} /></div>
-      <div className="small muted">{used.length} jab{used.length === 1 ? '' : 's'} from this vial{dose ? ` · at ${round2(dose)} mg each` : ''}</div>
+      <div className="small muted">{used.length} jab{used.length === 1 ? '' : 's'} from this vial{dose ? ` · ${round2(dose)} mg each` : ''}</div>
     </Glass>
   );
 }
 
-function JabSheet({ date: initialDate, jab, active, vials, onClose }: { date: string; jab?: Jab; active?: Vial; vials: Vial[]; onClose: () => void }) {
+export function JabSheet({ jab, active, vials, onClose }: { jab?: Jab; active?: Vial; vials: Vial[]; onClose: () => void }) {
   const prefs = usePrefs();
   const savedVial = useSetting<SavedVial | null>('savedVial', null);
-  const [date, setDate] = useState(jab?.date ?? initialDate);
+  const [date, setDate] = useState(jab?.date ?? today());
   const [units, setUnits] = useState(jab?.units ?? 0);
   const [doseOverride, setDoseOverride] = useState<number | null>(jab ? jab.doseMg : null);
   const [newVial, setNewVial] = useState(jab?.newVial ?? !active);
@@ -146,11 +118,11 @@ function JabSheet({ date: initialDate, jab, active, vials, onClose }: { date: st
   const autoDose = conc && units > 0 ? unitsToMg(units, conc, syringe) : NaN;
   const doseMg = doseOverride ?? autoDose;
 
-  // New entry: prefill units from the calculator's saved plan once it loads.
+  // New entry: prefill units from the calculator's saved vial once it loads.
   const [prefilled, setPrefilled] = useState(!!jab);
   useEffect(() => {
     if (prefilled || !savedVial) return;
-    const guess = check({ ...savedVial, syringeType: savedVial.syringeType })?.units;
+    const guess = check(savedVial)?.units;
     if (guess) setUnits(round1(guess));
     setPrefilled(true);
   }, [savedVial, prefilled]);
@@ -211,7 +183,7 @@ function JabSheet({ date: initialDate, jab, active, vials, onClose }: { date: st
         </Glass>
       )}
 
-      <PillButton block disabled={!valid || busy} onClick={save}>
+      <PillButton block disabled={!valid || busy} onClick={save} data-sound="success">
         Save jab <SyringeIcon />
       </PillButton>
       {jab && <PillButton block variant="danger" onClick={remove}>Delete</PillButton>}
