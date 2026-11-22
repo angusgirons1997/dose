@@ -1,6 +1,6 @@
 // Generates the PWA / apple-touch icons as PNGs with no dependencies. Run: node scripts/make-icons.mjs
-// Design (64-unit grid, matches public/favicon.svg): "measure marks" — vertical syringe graduations
-// in white on one flat terracotta colour (no gradient).
+// Design (64-unit grid; also writes public/favicon.svg): a white syringe glyph at 45 degrees on one
+// flat terracotta colour (no gradient).
 import { writeFileSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
 
@@ -20,23 +20,43 @@ const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
 
 const BG = [176, 87, 58]; // #B0573A
 const WHITE = [255, 255, 255];
-// Eight evenly spaced vertical graduation marks on one baseline, as on a U-100 syringe barrel.
-// [x, height, opacity]; all 2.8 wide with rounded ends.
-const W = 2.8, GAP = 3.2, BASE = 46;
-// U-100 scale: a mark every 2 units, long marks every 10 units (5 marks apart) -> i I i i i i I i
-const HEIGHTS = [14, 28, 14, 14, 14, 14, 28, 14];
-const X0 = 32 - (HEIGHTS.length * W + (HEIGHTS.length - 1) * GAP) / 2;
-const BARS = HEIGHTS.map((h, i) => [X0 + i * (W + GAP), h, 1]);
-const inBar = (x, y, [bx, h]) => {
-  const r = W / 2, cx = bx + r;
-  const cy = Math.min(Math.max(y, BASE - h + r), BASE - r);
-  return Math.hypot(x - cx, y - cy) <= r;
+// White syringe glyph at 45° (needle to the bottom left), built from rounded boxes in the syringe's
+// own frame: u runs plunger -> needle, v across it. [centre u, centre v, half length, half width,
+// corner radius, ring thickness (0 = solid)].
+const PARTS = [
+  [-21.5, 0, 1.5, 7, 1.2, 0],     // thumb pad
+  [-16.5, 0, 4, 1.6, 0.6, 0],     // plunger rod
+  [-12, 0, 1.2, 9.5, 1.2, 0],     // finger flange
+  [0, 0, 12, 6.5, 2.5, 2.2],      // barrel (outline)
+  [-8.6, 0, 1.1, 4.3, 0.4, 0],    // rubber stopper
+  [6.5, 0, 4.5, 4.3, 0.6, 0],     // liquid
+  [-4, -3.05, 0.55, 1.25, 0.5, 0], // graduations
+  [-0.5, -3.05, 0.55, 1.25, 0.5, 0],
+  [14, 0, 2, 2.6, 0.8, 0],        // hub
+  [20, 0, 4.5, 0.75, 0.75, 0],    // needle
+];
+const SHIFT = 0.75, SCALE = 1.15; // centre the glyph and size it to ~60% of the tile
+const sdBox = (u, v, [cu, cv, hu, hv, r]) => {
+  const qx = Math.abs(u - cu) - hu + r, qy = Math.abs(v - cv) - hv + r;
+  return Math.min(Math.max(qx, qy), 0) + Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) - r;
 };
 function shade(x, y) {
-  for (const b of BARS) if (inBar(x, y, b)) return mix(BG, WHITE, b[2]);
+  const k = Math.SQRT1_2, dx = x - 32, dy = y - 32;
+  const u = ((-dx + dy) * k) / SCALE + SHIFT, v = ((dx + dy) * k) / SCALE;
+  for (const part of PARTS) {
+    const d = sdBox(u, v, part), t = part[5];
+    if (t ? d <= 0 && d >= -t : d <= 0) return WHITE;
+  }
   return BG;
 }
 
+// Favicon from the same parts (SVG rotate(135) points local +x down-left; its +y is our -v).
+const svgParts = PARTS.map(([cu, cv, hu, hv, r, t]) => {
+  const geo = `x="${cu - SHIFT - hu + t / 2}" y="${-cv - hv + t / 2}" width="${2 * hu - t}" height="${2 * hv - t}" rx="${Math.max(0, r - t / 2)}"`;
+  return t ? `<rect ${geo} fill="none" stroke="#fff" stroke-width="${t}"/>` : `<rect ${geo} fill="#fff"/>`;
+}).join('');
+writeFileSync('public/favicon.svg', `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#B0573A"/><g transform="translate(32 32) rotate(135) scale(${SCALE})">${svgParts}</g></svg>
+`);
 
 function icon(size) {
   const SS = 4; // supersampling per axis

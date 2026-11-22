@@ -81,3 +81,6 @@ Calls made while building without asking.
 - **Icon:** eight evenly spaced vertical graduations on one baseline, in the U-100 rhythm `i I i i i i I i` (a mark every 2 units, a long mark every 10). Same flat #B0573A.
 - **Home has its own palette** (dusk: coral, rose, violet over plum); it used to share Calculator's.
 - **Backgrounds move:** each tab has a base wash plus two floating colour sets (`::before` / `::after`) that drift, rotate and scale on 23s and 31s cycles that don't line up, so the field keeps changing. Transform-only on pre-painted layers; the hidden tabs' animations are paused and reduced-motion stops them.
+
+## Round 8: syringe glyph icon
+- **Icon:** a white syringe glyph at 45° (needle bottom-left) on the same flat #B0573A: thumb pad, rod, finger flange, outlined barrel with two graduations, stopper and liquid, hub, needle. Replaces the measure-marks icon. `scripts/make-icons.mjs` now writes `favicon.svg` from the same parts list so the two always match.
