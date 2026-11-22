@@ -42,12 +42,12 @@ export function Body() {
         <div className="spread" style={{ alignItems: 'flex-end', marginBottom: 14 }}>
           <div>
             <div className="label">Weight over time</div>
-            <div className="big-num">{last ? round1(last.kg) : '—'}<span className="muted" style={{ fontSize: 18 }}> kg</span></div>
+            <div className="big-num">{last ? round1(last.kg) : '—'}<span className="muted" style={{ fontSize: 14 }}> kg</span></div>
           </div>
           {weights.length > 1 && (
             <div style={{ textAlign: 'right' }}>
               <div className="label">Since {fmtDate(first.date)}</div>
-              <div style={{ fontSize: 22, fontWeight: 700 }}>{change > 0 ? '+' : change < 0 ? '−' : ''}{round1(Math.abs(change))} kg</div>
+              <div style={{ fontSize: 15, fontWeight: 500 }}>{change > 0 ? '+' : change < 0 ? '−' : ''}{round1(Math.abs(change))} kg</div>
             </div>
           )}
         </div>

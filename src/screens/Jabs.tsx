@@ -86,7 +86,7 @@ function ActiveVial({ vial, jabs }: { vial?: Vial; jabs: Jab[] }) {
       <div className="spread" style={{ alignItems: 'flex-end' }}>
         <div>
           <div className="label">Remaining</div>
-          <div className="big-num">{round2(remainingMg)}<span className="muted" style={{ fontSize: 18 }}> mg</span></div>
+          <div className="big-num">{round2(remainingMg)}<span className="muted" style={{ fontSize: 14 }}> mg</span></div>
         </div>
         <div style={{ textAlign: 'right' }}>
           <div className="label">Jabs left</div>

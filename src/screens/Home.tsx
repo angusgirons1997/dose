@@ -85,10 +85,10 @@ export function Home({ go, openSettings }: { go: (t: Tab) => void; openSettings:
         <div className="spread" style={{ alignItems: 'flex-end' }}>
           <div>
             <div className="label">Weight</div>
-            <div className="big-num">{latest ? round1(latest.kg) : '—'}<span className="muted" style={{ fontSize: 18 }}> kg</span></div>
+            <div className="big-num">{latest ? round1(latest.kg) : '—'}<span className="muted" style={{ fontSize: 14 }}> kg</span></div>
           </div>
           {weights.length > 1 && (
-            <div style={{ fontSize: 18, fontWeight: 700 }}>{change > 0 ? '+' : change < 0 ? '−' : ''}{round1(Math.abs(change))} kg</div>
+            <div style={{ fontSize: 15, fontWeight: 500 }}>{change > 0 ? '+' : change < 0 ? '−' : ''}{round1(Math.abs(change))} kg</div>
           )}
         </div>
         {weights.length > 1 && <div className="chart"><Chart weights={weights} compact /></div>}

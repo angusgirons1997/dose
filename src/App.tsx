@@ -47,9 +47,7 @@ export function App() {
       </div>
 
       {/* Blurs content under the nav (iOS scroll-edge effect) and swallows taps there */}
-      <div className="nav-shield" />
-      {tab === 'calc' && <p className="disclaimer">Calculator only — not medical advice. Check your maths.</p>}
-      <TabBar tab={tab} onChange={setTab} />
+      <div className="nav-shield" />      <TabBar tab={tab} onChange={setTab} />
       {settings && <Settings onClose={() => setSettings(false)} />}
     </div>
   );

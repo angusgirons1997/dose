@@ -69,3 +69,10 @@ Calls made while building without asking.
 - **Tab bar.** Lighter glass capsule; the selected tab is a single glass "lens" that slides between tabs with the page, like iOS 26.
 - **Jab countdown.** Home leads with "Next jab": days to go (Today / Tomorrow / n days late in amber), due date and a progress ring. Interval is per peptide (Settings → Jab schedule, keyed by peptide name, default 7 days; with no vials saved it shows "Reta"). Peptide comes from the active vial, else the last jab's vial, else Reta. Maths is `nextJab` in `calc.ts` (UTC day counting, so no DST drift).
 - **Icon:** paused while Gus picks a direction; the old glass-D `Logo` component is deleted.
+
+## Round 6: clear glass, smaller type, measure-marks icon
+- **Icon:** "measure marks" — three white rounded bars, shortening and fading like syringe graduations, on one flat terracotta (#B0573A), no gradient. `scripts/make-icons.mjs` renders the PNGs; `public/favicon.svg` matches.
+- **Disclaimer removed** from the calculator, at Gus's request.
+- **Clear glass** (reference: a near-transparent card on a cloud photo): card fill is almost nothing; the shape comes from a 1.5px specular rim, bright at top-left and bottom-right corners. Buttons and chips get the same rim with a faint warm-dark tint.
+- **Parallax shine:** a second highlight layer in the rim slides along the edge as each card scrolls, using a CSS scroll-driven animation (`animation-timeline: view()`). Where that isn't supported (older iOS) the rim is just static.
+- **Type scaled down and lightened:** title 26/600, big numbers 30/500, calculator hero 52/500, buttons 14/500 at 44px tall, labels 12px. Inputs stay 16px+ so iOS doesn't zoom on focus.

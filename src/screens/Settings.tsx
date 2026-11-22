@@ -48,7 +48,7 @@ export function Settings({ onClose }: { onClose: () => void }) {
     <Sheet title="Settings" onClose={onClose}>
       <Glass className="tight stack">
         <div>
-          <b style={{ fontSize: 17 }}>Back up your data</b>
+          <b style={{ fontSize: 15, fontWeight: 600 }}>Back up your data</b>
           <p className="small muted" style={{ margin: '4px 0 0' }}>
             iOS can wipe home-screen app storage. Export regularly and keep the file in iCloud Drive / Files.
           </p>
@@ -64,7 +64,7 @@ export function Settings({ onClose }: { onClose: () => void }) {
 
       <Glass className="tight stack">
         <div>
-          <b style={{ fontSize: 17 }}>Jab schedule</b>
+          <b style={{ fontSize: 15, fontWeight: 600 }}>Jab schedule</b>
           <p className="small muted" style={{ margin: '4px 0 0' }}>Days between jabs, used for the countdown on Home.</p>
         </div>
         {peptides.map((name) => (
@@ -82,7 +82,7 @@ export function Settings({ onClose }: { onClose: () => void }) {
       </Glass>
 
       <Glass className="tight stack">
-        <b style={{ fontSize: 17 }}>Syringe defaults</b>
+        <b style={{ fontSize: 15, fontWeight: 600 }}>Syringe defaults</b>
         <Segmented<SyringeType> label="Syringe type" value={prefs.syringeType} onChange={(syringeType) => set({ syringeType })} options={[{ value: 'U-100', label: 'U-100' }, { value: 'U-40', label: 'U-40' }]} />
         <Segmented<CapacityMl> label="Capacity" value={prefs.capacityMl} onChange={(capacityMl) => set({ capacityMl })} options={[{ value: 0.3, label: '0.3 mL' }, { value: 0.5, label: '0.5 mL' }, { value: 1, label: '1 mL' }]} />
       </Glass>

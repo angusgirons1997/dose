@@ -4,7 +4,7 @@
 html { height: 100%; overflow: hidden; background: #1c1210; } /* clip at the viewport only: a clipped body would cut the app box short on iOS */
 body { margin: 0; }
 body {
-  font-family: var(--font);
+  font-family: var(--font); font-size: 15px;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
@@ -86,33 +86,41 @@ input:focus-visible, button:focus-visible, select:focus-visible { outline: 2px s
   max-width: 520px; margin: 0 auto;
   display: flex; flex-direction: column; gap: 16px;
 }
-.title { font-size: 38px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; margin: 4px 0 4px; }
+.title { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.1; margin: 2px 0 2px; }
 .subtitle { color: var(--text-muted); font-size: 15px; margin: -8px 0 0; }
-.label { font-size: 13px; color: var(--text-muted); }
+.label { font-size: 12px; color: var(--text-muted); }
 .muted { color: var(--text-muted); }
-.small { font-size: 13px; line-height: 1.4; }
+.small { font-size: 12px; line-height: 1.4; }
 .row { display: flex; align-items: center; gap: 10px; }
 .spread { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .stack { display: flex; flex-direction: column; gap: 12px; }
-.section-title { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 8px 4px -4px; }
+.section-title { font-size: 11px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 8px 4px -4px; }
 
 /* ---------- glass ---------- */
-/* iOS 26 Liquid Glass: a thick, bright, frosted slab. Light catches the top-left and bottom-right
-   edges (specular rim), the body glows faintly from inside, and it floats on a soft shadow. */
+/* Clear Liquid Glass: almost no fill, so the colour shows straight through; what defines the shape
+   is a bright specular rim (corner highlights at top-left / bottom-right) plus a sheen that travels
+   along the edge as the card scrolls (parallax shine). */
 .glass {
   position: relative;
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.13) 45%, rgba(255, 255, 255, 0.18));
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.08));
   box-shadow: var(--glass-shadow);
 }
-.glass::before, .pill-btn::before {
-  content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1.2px; pointer-events: none;
-  background: linear-gradient(140deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.12) 28%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 72%, rgba(255, 255, 255, 0.5));
+.glass::before, .pill-btn::before, .chip::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.1) 22%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.08) 78%, rgba(255, 255, 255, 0.6)),
+    linear-gradient(170deg, transparent 20%, rgba(255, 255, 255, 0.55) 30%, transparent 40%, transparent 60%, rgba(255, 255, 255, 0.4) 70%, transparent 80%);
+  background-size: 100% 100%, 100% 300%; background-position: 0 0, 0 50%;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude;
 }
+@supports (animation-timeline: view()) {
+  .glass::before, .pill-btn::before, .chip::before { animation: sheen linear both; animation-timeline: view(); }
+}
+@keyframes sheen { from { background-position: 0 0, 0 0; } to { background-position: 0 0, 0 100%; } }
 /* real blur only on the few things that sit over moving content */
 .tabbar, .sheet { -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); }
-.card { border-radius: var(--radius-card); padding: 24px; position: relative; }
+.card { border-radius: var(--radius-card); padding: 20px; position: relative; }
 .card.tight { padding: 18px; }
 .icon-btn {
   width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
@@ -123,49 +131,49 @@ input:focus-visible, button:focus-visible, select:focus-visible { outline: 2px s
 
 .chip {
   display: inline-flex; align-items: center; height: 30px; padding: 0 12px; border-radius: var(--radius-pill);
-  font-size: 13px; background: var(--glass-bg-strong); white-space: nowrap;
+  font-size: 12px; background: var(--glass-bg-strong); white-space: nowrap; position: relative;
 }
 .chip { box-shadow: var(--raised-shadow); }
-.chip[aria-pressed='true'] { background: var(--well-bg); box-shadow: var(--well-shadow); font-weight: 600; }
+.chip[aria-pressed='true'] { background: var(--well-bg); box-shadow: var(--well-shadow); font-weight: 500; }
 .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -2px; padding: 2px; }
 .chips::-webkit-scrollbar { display: none; }
 
 .pill-btn {
-  height: 52px; border-radius: var(--radius-pill); padding: 0 22px; display: inline-flex; align-items: center;
-  justify-content: center; gap: 10px; font-weight: 600; font-size: 16px; position: relative;
+  height: 44px; border-radius: var(--radius-pill); padding: 0 20px; display: inline-flex; align-items: center;
+  justify-content: center; gap: 8px; font-weight: 500; font-size: 14px; position: relative;
   background: var(--raised-bg); color: var(--text); box-shadow: var(--raised-shadow);
 }
 .pill-btn.ghost { background: rgba(255, 255, 255, 0.1); }
 .pill-btn.ghost::before { opacity: 0.5; }
 .pill-btn.danger { background: rgba(255, 90, 80, 0.18); color: #ffd5d0; }
 .pill-btn:disabled { opacity: 0.45; }
-.pill-btn svg { width: 18px; height: 18px; }
+.pill-btn svg { width: 16px; height: 16px; }
 .pill-btn.block { width: 100%; }
 
 /* segmented control */
 .seg { display: flex; padding: 4px; border-radius: var(--radius-pill); gap: 4px; }
-.seg button { flex: 1; height: 38px; border-radius: var(--radius-pill); font-size: 14px; font-weight: 600; color: var(--text-muted); transition: background 0.2s var(--ease); }
+.seg button { flex: 1; height: 34px; border-radius: var(--radius-pill); font-size: 13px; font-weight: 500; color: var(--text-muted); transition: background 0.2s var(--ease); }
 .seg { background: rgba(0, 0, 0, 0.1); }
 .seg button[aria-pressed='true'] { background: var(--raised-bg); box-shadow: var(--raised-shadow); color: var(--text); }
 
 /* list pill (image 04) */
 .list-pill { display: flex; align-items: center; gap: 14px; border-radius: 28px; padding: 14px 18px 14px 14px; text-align: left; width: 100%; }
-.list-pill .ico { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--glass-bg-strong); flex: none; }
+.list-pill .ico { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--glass-bg-strong); flex: none; }
 .list-pill .ico.ring { box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.75); }
-.list-pill .ico svg { width: 20px; height: 20px; }
-.list-pill .t { font-size: 17px; font-weight: 600; }
-.list-pill .s { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.list-pill .ico svg { width: 17px; height: 17px; }
+.list-pill .t { font-size: 15px; font-weight: 500; }
+.list-pill .s { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 .list-pill .end { margin-left: auto; text-align: right; }
 
 /* ---------- stepper field ---------- */
 .field { display: flex; flex-direction: column; gap: 8px; }
 .stepper { display: flex; align-items: center; gap: 8px; }
-.stepper .icon-btn { width: 44px; height: 44px; }
+.stepper .icon-btn { width: 38px; height: 38px; }
 .stepper input {
-  flex: 1; min-width: 0; height: 52px; border-radius: 20px; text-align: center; font-size: 26px; font-weight: 700;
+  flex: 1; min-width: 0; height: 44px; border-radius: 18px; text-align: center; font-size: 20px; font-weight: 500;
   background: rgba(0, 0, 0, 0.14); border: 0; letter-spacing: -0.01em;
 }
-.stepper .unit { font-size: 15px; color: var(--text-muted); width: 34px; }
+.stepper .unit { font-size: 13px; color: var(--text-muted); width: 34px; }
 .text-input {
   height: 48px; border-radius: 18px; padding: 0 16px; width: 100%; font-size: 16px;
   background: rgba(0, 0, 0, 0.14); border: 0;
@@ -173,19 +181,15 @@ input:focus-visible, button:focus-visible, select:focus-visible { outline: 2px s
 .text-input::placeholder { color: var(--text-muted); }
 
 /* ---------- calculator ---------- */
-.hero { font-size: 84px; font-weight: 700; letter-spacing: -0.04em; line-height: 0.95; animation: fade 0.25s var(--ease); }
-.hero small { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; margin-left: 6px; color: var(--text-muted); }
+.hero { font-size: 52px; font-weight: 500; letter-spacing: -0.04em; line-height: 0.95; animation: fade 0.25s var(--ease); }
+.hero small { font-size: 17px; font-weight: 400; letter-spacing: -0.01em; margin-left: 6px; color: var(--text-muted); }
 @keyframes fade { from { opacity: 0.2; } to { opacity: 1; } }
 .divider { height: 1px; background: var(--hairline); margin: 20px 0; }
 .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
-.stats b { display: block; font-size: 18px; margin-top: 2px; }
+.stats b { display: block; font-size: 15px; font-weight: 500; margin-top: 2px; }
 .stats.three { grid-template-columns: repeat(3, 1fr); }
-.stats.three b { font-size: 16px; }
-.warn { border-radius: 18px; padding: 10px 14px; background: var(--amber-bg); color: var(--amber); font-size: 14px; line-height: 1.35; }
-.disclaimer {
-  position: absolute; left: 0; right: 0; bottom: calc(var(--safe-bottom) + var(--tabbar-h) + 22px);
-  text-align: center; font-size: 11px; color: rgba(255, 255, 255, 0.75); margin: 0; z-index: 10; pointer-events: none;
-}
+.stats.three b { font-size: 14px; }
+.warn { border-radius: 18px; padding: 10px 14px; background: var(--amber-bg); color: var(--amber); font-size: 13px; line-height: 1.35; }
 
 /* syringe bar */
 .syringe { position: relative; height: 36px; border-radius: var(--radius-pill); overflow: hidden; }
@@ -200,16 +204,16 @@ input:focus-visible, button:focus-visible, select:focus-visible { outline: 2px s
   position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(var(--safe-bottom) + 12px);
   height: var(--tabbar-h); width: min(360px, calc(100% - 32px)); border-radius: 33px;
   display: flex; justify-content: space-around; align-items: center; z-index: 10; padding: 0 6px;
-  background: rgba(255, 255, 255, 0.14); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.07); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.25), inset 0 0 20px rgba(255, 255, 255, 0.06);
 }
 /* the selected-tab lozenge: one glass drop that slides between tabs with the page */
 .tabbar .lens {
   position: absolute; top: 6px; bottom: 6px; left: 6px; width: calc((100% - 12px) / 4); border-radius: 27px;
-  background: linear-gradient(170deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.14));
+  background: linear-gradient(170deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14), inset 0 1px 1px rgba(255, 255, 255, 0.7), inset 0 -1px 1px rgba(255, 255, 255, 0.2);
   transform: translate3d(calc(var(--tab-i, 0) * 100%), 0, 0); transition: transform var(--slide);
 }
-.tabbar button { position: relative; flex: 1; height: 54px; border-radius: 27px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 10.5px; font-weight: 600; color: var(--text-muted); transition: background 0.25s var(--ease), color 0.25s; }
+.tabbar button { position: relative; flex: 1; height: 54px; border-radius: 27px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 10px; font-weight: 500; color: var(--text-muted); transition: background 0.25s var(--ease), color 0.25s; }
 .tabbar button[aria-current='page'] { color: var(--text); }
 .nav-shield {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 9;
@@ -230,7 +234,7 @@ input:focus-visible, button:focus-visible, select:focus-visible { outline: 2px s
   animation: slideup 0.25s var(--ease); overscroll-behavior: contain;
 }
 .sheet .handle { width: 40px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.35); margin: 0 auto 14px; }
-.sheet h2 { font-size: 26px; letter-spacing: -0.02em; margin: 0; }
+.sheet h2 { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
 @keyframes slideup { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
 
@@ -242,9 +246,9 @@ input:focus-visible, button:focus-visible, select:focus-visible { outline: 2px s
 .meter { height: 8px; border-radius: 4px; background: rgba(255, 255, 255, 0.15); overflow: hidden; }
 .meter { box-shadow: var(--well-shadow); }
 .meter > div { height: 100%; background: rgba(255, 255, 255, 0.8); border-radius: 4px; }
-.big-num { font-size: 44px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; margin-top: 4px; }
+.big-num { font-size: 30px; font-weight: 500; letter-spacing: -0.03em; line-height: 1; margin-top: 4px; }
 .big-num.late { color: var(--amber); }
-.ring { flex: none; transform: rotate(-90deg); }
+.ring { flex: none; width: 52px; height: 52px; transform: rotate(-90deg); }
 .ring circle { fill: none; stroke-width: 7; stroke: rgba(0, 0, 0, 0.16); }
 .ring circle.v { stroke: rgba(255, 255, 255, 0.9); stroke-linecap: round; transition: stroke-dasharray 0.4s var(--ease); }
 
@@ -253,14 +257,14 @@ input:focus-visible, button:focus-visible, select:focus-visible { outline: 2px s
 .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .photo-grid button { position: relative; aspect-ratio: 3 / 4; border-radius: 18px; overflow: hidden; box-shadow: none; }
 .photo-grid img, .compare img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.photo-grid .d { position: absolute; left: 6px; bottom: 6px; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: rgba(0, 0, 0, 0.45); }
+.photo-grid .d { position: absolute; left: 6px; bottom: 6px; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 99px; background: rgba(0, 0, 0, 0.45); }
 .photo-grid .sel { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border-radius: 50%; background: rgba(255, 255, 255, 0.9); color: #222; font-size: 13px; font-weight: 700; display: grid; place-items: center; }
 .photo-grid button.picked { box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.85); }
 .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .compare figure { margin: 0; border-radius: 20px; overflow: hidden; aspect-ratio: 3 / 4; position: relative; }
-.compare figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 20px 10px 8px; font-size: 13px; font-weight: 600; background: linear-gradient(transparent, rgba(0, 0, 0, 0.6)); }
+.compare figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 20px 10px 8px; font-size: 12px; font-weight: 500; background: linear-gradient(transparent, rgba(0, 0, 0, 0.6)); }
 .photo-pick { display: flex; gap: 8px; }
 .photo-pick label { flex: 1; }
 .photo-pick input { display: none; }
 .thumb { width: 64px; height: 64px; border-radius: 16px; object-fit: cover; }
-.empty { text-align: center; color: var(--text-muted); font-size: 14px; padding: 16px 8px; }
+.empty { text-align: center; color: var(--text-muted); font-size: 13px; padding: 16px 8px; }
