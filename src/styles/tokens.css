@@ -1,0 +1,41 @@
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-bg-strong: rgba(255, 255, 255, 0.16);
+  --glass-border: rgba(255, 255, 255, 0.22);
+  --glass-blur: blur(28px) saturate(140%);
+  --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  --radius-card: 32px;
+  --radius-pill: 999px;
+  --cream: #fbf3c4;
+  --cream-ink: #1a1a1a;
+  --text: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.62);
+  --amber: #ffc76b;
+  --amber-bg: rgba(255, 176, 60, 0.16);
+  --danger: #ff7a6b;
+
+  --font: -apple-system, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --tabbar-h: 68px;
+
+  /* palette per tab, set on <html data-tab> */
+  --c1: #8c4a32;
+  --c2: #c98a3e;
+  --c3: #7e93a8;
+  --base: #3a2219;
+}
+[data-tab='jabs'] {
+  --c1: #5a1e22;
+  --c2: #b5525a;
+  --c3: #3b2033;
+  --base: #2a1216;
+}
+[data-tab='body'] {
+  --c1: #1e3b40;
+  --c2: #4a5f6b;
+  --c3: #b89a74;
+  --base: #152427;
+}
