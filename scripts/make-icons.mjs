@@ -20,10 +20,11 @@ const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
 
 const BG = [176, 87, 58]; // #B0573A
 const WHITE = [255, 255, 255];
-// Eight vertical graduation marks standing on one baseline, like a syringe scale: two tall marks
-// in the centre, shorter ones either side. [x, height, opacity]; all 2.8 wide with rounded ends.
+// Eight evenly spaced vertical graduation marks on one baseline, as on a U-100 syringe barrel.
+// [x, height, opacity]; all 2.8 wide with rounded ends.
 const W = 2.8, GAP = 3.2, BASE = 46;
-const HEIGHTS = [10, 14, 10, 28, 28, 10, 14, 10];
+// U-100 scale: a mark every 2 units, long marks every 10 units (5 marks apart) -> i I i i i i I i
+const HEIGHTS = [14, 28, 14, 14, 14, 14, 28, 14];
 const X0 = 32 - (HEIGHTS.length * W + (HEIGHTS.length - 1) * GAP) / 2;
 const BARS = HEIGHTS.map((h, i) => [X0 + i * (W + GAP), h, 1]);
 const inBar = (x, y, [bx, h]) => {

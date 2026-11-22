@@ -78,6 +78,6 @@ Calls made while building without asking.
 - **Type scaled down and lightened:** title 26/600, big numbers 30/500, calculator hero 52/500, buttons 14/500 at 44px tall, labels 12px. Inputs stay 16px+ so iOS doesn't zoom on focus.
 
 ## Round 7: vertical marks icon, livelier backgrounds
-- **Icon:** eight vertical syringe graduations on one baseline: two tall marks in the centre, shorter ones either side (10/14/10 units, centre 28). Same flat #B0573A.
+- **Icon:** eight evenly spaced vertical graduations on one baseline, in the U-100 rhythm `i I i i i i I i` (a mark every 2 units, a long mark every 10). Same flat #B0573A.
 - **Home has its own palette** (dusk: coral, rose, violet over plum); it used to share Calculator's.
 - **Backgrounds move:** each tab has a base wash plus two floating colour sets (`::before` / `::after`) that drift, rotate and scale on 23s and 31s cycles that don't line up, so the field keeps changing. Transform-only on pre-painted layers; the hidden tabs' animations are paused and reduced-motion stops them.
