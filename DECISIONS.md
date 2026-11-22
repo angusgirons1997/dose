@@ -83,4 +83,4 @@ Calls made while building without asking.
 - **Backgrounds move:** each tab has a base wash plus two floating colour sets (`::before` / `::after`) that drift, rotate and scale on 23s and 31s cycles that don't line up, so the field keeps changing. Transform-only on pre-painted layers; the hidden tabs' animations are paused and reduced-motion stops them.
 
 ## Round 8: syringe glyph icon
-- **Icon:** a white syringe glyph at 45° (needle bottom-left) on the same flat #B0573A: thumb pad, rod, finger flange, outlined barrel with two graduations, stopper and liquid, hub, needle. Replaces the measure-marks icon. `scripts/make-icons.mjs` now writes `favicon.svg` from the same parts list so the two always match.
+- **Icon:** a chunky cartoon syringe glyph in white at 45° (needle bottom-left) on the same flat #B0573A: five solid rounded shapes (thumb pad, rod, finger grip, barrel, needle), no inner detail. Replaces the measure-marks icon. `scripts/make-icons.mjs` now writes `favicon.svg` from the same parts list so the two always match.

@@ -23,19 +23,15 @@ const WHITE = [255, 255, 255];
 // White syringe glyph at 45° (needle to the bottom left), built from rounded boxes in the syringe's
 // own frame: u runs plunger -> needle, v across it. [centre u, centre v, half length, half width,
 // corner radius, ring thickness (0 = solid)].
+// Cartoon style: four chunky, fully rounded solid shapes, no inner detail.
 const PARTS = [
-  [-21.5, 0, 1.5, 7, 1.2, 0],     // thumb pad
-  [-16.5, 0, 4, 1.6, 0.6, 0],     // plunger rod
-  [-12, 0, 1.2, 9.5, 1.2, 0],     // finger flange
-  [0, 0, 12, 6.5, 2.5, 2.2],      // barrel (outline)
-  [-8.6, 0, 1.1, 4.3, 0.4, 0],    // rubber stopper
-  [6.5, 0, 4.5, 4.3, 0.6, 0],     // liquid
-  [-4, -3.05, 0.55, 1.25, 0.5, 0], // graduations
-  [-0.5, -3.05, 0.55, 1.25, 0.5, 0],
-  [14, 0, 2, 2.6, 0.8, 0],        // hub
-  [20, 0, 4.5, 0.75, 0.75, 0],    // needle
+  [-21.5, 0, 2.2, 8, 2.2, 0],   // thumb pad
+  [-16, 0, 4, 2.6, 1.3, 0],     // plunger rod
+  [-12, 0, 1.8, 11, 1.8, 0],    // finger grip
+  [-1, 0, 11, 8, 4, 0],         // barrel
+  [15.5, 0, 6.5, 1.5, 1.5, 0],  // needle
 ];
-const SHIFT = 0.75, SCALE = 1.15; // centre the glyph and size it to ~60% of the tile
+const SHIFT = -0.85, SCALE = 1.15; // centre the glyph and size it to ~60% of the tile
 const sdBox = (u, v, [cu, cv, hu, hv, r]) => {
   const qx = Math.abs(u - cu) - hu + r, qy = Math.abs(v - cv) - hv + r;
   return Math.min(Math.max(qx, qy), 0) + Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) - r;
