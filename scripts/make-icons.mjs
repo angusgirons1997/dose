@@ -20,38 +20,44 @@ const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
 
 const BG = [176, 87, 58]; // #B0573A
 const WHITE = [255, 255, 255];
-// White syringe glyph at 45° (needle to the bottom left), built from rounded boxes in the syringe's
-// own frame: u runs plunger -> needle, v across it. [centre u, centre v, half length, half width,
-// corner radius, ring thickness (0 = solid)].
-// Cartoon style: four chunky, fully rounded solid shapes, no inner detail.
+// White syringe glyph at 45° (needle to the bottom left), in the classic solid pictogram style:
+// T plunger, wide finger flange, squared barrel with three graduation notches cut into one edge,
+// a tapered tip and a thin needle. Shapes are in the syringe's own frame: u runs plunger -> needle,
+// v across it (negative v = the upper-left edge on screen). Boxes are [cu, cv, half u, half v, radius].
 const PARTS = [
-  [-21.5, 0, 2.2, 8, 2.2, 0],   // thumb pad
-  [-16, 0, 4, 2.6, 1.3, 0],     // plunger rod
-  [-12, 0, 1.8, 11, 1.8, 0],    // finger grip
-  [-1, 0, 11, 8, 4, 0],         // barrel
-  [15.5, 0, 6.5, 1.5, 1.5, 0],  // needle
+  [-23, 0, 1.4, 6, 1],      // thumb pad
+  [-18.5, 0, 3.6, 1.7, 0.6], // plunger rod
+  [-13.5, 0, 1.3, 10, 1],   // finger flange
+  [-1, 0, 11.2, 6.5, 1.2],  // barrel
+  [19, 0, 4, 1.1, 1.1],     // needle
 ];
-const SHIFT = -0.85, SCALE = 1.15; // centre the glyph and size it to ~60% of the tile
+const TAPER = [9.6, 15.5, 6.5, 1.3]; // tip cone: u from, u to, half width from, half width to
+const CUTS = [-6, -2, 2].map((cu) => [cu, -5.5, 0.6, 3, 0.6]); // graduation notches
+const SHIFT = -0.7, SCALE = 1.15; // centre the glyph and size it to ~60% of the tile
 const sdBox = (u, v, [cu, cv, hu, hv, r]) => {
   const qx = Math.abs(u - cu) - hu + r, qy = Math.abs(v - cv) - hv + r;
   return Math.min(Math.max(qx, qy), 0) + Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) - r;
 };
+const inTaper = (u, v) => {
+  const [u0, u1, h0, h1] = TAPER;
+  return u >= u0 && u <= u1 && Math.abs(v) <= h0 + ((u - u0) / (u1 - u0)) * (h1 - h0);
+};
 function shade(x, y) {
   const k = Math.SQRT1_2, dx = x - 32, dy = y - 32;
   const u = ((-dx + dy) * k) / SCALE + SHIFT, v = ((dx + dy) * k) / SCALE;
-  for (const part of PARTS) {
-    const d = sdBox(u, v, part), t = part[5];
-    if (t ? d <= 0 && d >= -t : d <= 0) return WHITE;
-  }
+  if (CUTS.some((c) => sdBox(u, v, c) <= 0)) return BG;
+  if (PARTS.some((part) => sdBox(u, v, part) <= 0) || inTaper(u, v)) return WHITE;
   return BG;
 }
 
-// Favicon from the same parts (SVG rotate(135) points local +x down-left; its +y is our -v).
-const svgParts = PARTS.map(([cu, cv, hu, hv, r, t]) => {
-  const geo = `x="${cu - SHIFT - hu + t / 2}" y="${-cv - hv + t / 2}" width="${2 * hu - t}" height="${2 * hv - t}" rx="${Math.max(0, r - t / 2)}"`;
-  return t ? `<rect ${geo} fill="none" stroke="#fff" stroke-width="${t}"/>` : `<rect ${geo} fill="#fff"/>`;
-}).join('');
-writeFileSync('public/favicon.svg', `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#B0573A"/><g transform="translate(32 32) rotate(135) scale(${SCALE})">${svgParts}</g></svg>
+// Favicon from the same shapes (SVG rotate(135) points local +x down-left; its +y is our -v).
+const rect = ([cu, cv, hu, hv, r], fill) =>
+  `<rect x="${cu - SHIFT - hu}" y="${-cv - hv}" width="${2 * hu}" height="${2 * hv}" rx="${r}" fill="${fill}"/>`;
+const [u0, u1, h0, h1] = TAPER.map((n, i) => (i < 2 ? n - SHIFT : n));
+const svg = PARTS.map((part) => rect(part, '#fff')).join('') +
+  `<polygon points="${u0},${-h0} ${u1},${-h1} ${u1},${h1} ${u0},${h0}" fill="#fff"/>` +
+  CUTS.map(([cu, cv, ...rest]) => rect([cu, cv, ...rest], '#B0573A')).join('');
+writeFileSync('public/favicon.svg', `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#B0573A"/><g transform="translate(32 32) rotate(135) scale(${SCALE})">${svg}</g></svg>
 `);
 
 function icon(size) {
