@@ -83,4 +83,4 @@ Calls made while building without asking.
 - **Backgrounds move:** each tab has a base wash plus two floating colour sets (`::before` / `::after`) that drift, rotate and scale on 23s and 31s cycles that don't line up, so the field keeps changing. Transform-only on pre-painted layers; the hidden tabs' animations are paused and reduced-motion stops them.
 
 ## Round 8: syringe glyph icon
-- **Icon:** a classic solid syringe pictogram in white at 45° (needle bottom-left) on the same flat #B0573A, after a stock glyph Gus supplied: T plunger, wide flange, squared barrel with three notches cut into one edge, tapered tip, thin needle. Replaces the measure-marks icon. `scripts/make-icons.mjs` now writes `favicon.svg` from the same parts list so the two always match.
+- **Icon:** a classic solid syringe pictogram, black on a plain white tile, redrawn to match a stock glyph Gus supplied (colours included): T plunger, wide flange, squared barrel with three notches cut into one edge, tapered tip, thin needle. Replaces the measure-marks icon. `scripts/make-icons.mjs` now writes `favicon.svg` from the same parts list so the two always match.
