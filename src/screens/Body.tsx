@@ -155,8 +155,8 @@ export function Chart({ weights, compact }: { weights: Weight[]; compact?: boole
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={kgs.length ? `Weight from ${round1(kgs[0])} to ${round1(kgs[kgs.length - 1])} kg` : 'No weights yet'}>
         <defs>
           <linearGradient id={gid} x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="var(--cream)" stopOpacity="0.35" />
-            <stop offset="1" stopColor="var(--cream)" stopOpacity="0" />
+            <stop offset="0" stopColor="#fff" stopOpacity="0.35" />
+            <stop offset="1" stopColor="#fff" stopOpacity="0" />
           </linearGradient>
         </defs>
         {!compact &&
@@ -167,8 +167,8 @@ export function Chart({ weights, compact }: { weights: Weight[]; compact?: boole
             </g>
           ))}
         {area && <path d={area} fill={`url(#${gid})`} />}
-        {pts.length > 1 && <path d={line} fill="none" stroke="var(--cream)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />}
-        {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r="5" fill="var(--cream)" stroke="rgba(0,0,0,.3)" />}
+        {pts.length > 1 && <path d={line} fill="none" stroke="#fff" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />}
+        {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r="5" fill="#fff" stroke="rgba(0,0,0,.3)" />}
         {!pts.length && !compact && (
           <text x={(L + W) / 2} y={H / 2 + 4} fontSize="13" textAnchor="middle" fill="rgba(255,255,255,.6)">Log a weight to start your graph</text>
         )}

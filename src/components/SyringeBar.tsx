@@ -1,6 +1,6 @@
 import { round1 } from '../lib/calc';
 
-/** Glass capsule with cream fill. Ticks every 10 units (every 5 for small capacities). */
+/** Glass capsule with a clear white fill. Ticks every 10 units (every 5 for small capacities). */
 export function SyringeBar({ units, capacityUnits }: { units: number; capacityUnits: number }) {
   const frac = units / capacityUnits;
   const every = capacityUnits <= 40 ? 5 : 10;

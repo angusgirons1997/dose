@@ -4,7 +4,7 @@ import { GearIcon } from './components/Icons';
 import { Logo } from './components/Logo';
 import { TABS, TabBar, type Tab } from './components/TabBar';
 import { useSetting } from './lib/db';
-import { installClickSounds, setSoundEnabled } from './lib/sound';
+import { installClickSounds, setHapticsEnabled, setSoundEnabled } from './lib/sound';
 import { Body } from './screens/Body';
 import { Calculator } from './screens/Calculator';
 import { Home } from './screens/Home';
@@ -15,10 +15,12 @@ export function App() {
   const [tab, setTab] = useState<Tab>('home');
   const [settings, setSettings] = useState(false);
   const sound = useSetting('sound', true);
+  const haptics = useSetting('haptics', true);
   const index = TABS.findIndex((t) => t.id === tab);
 
   useEffect(installClickSounds, []);
   useEffect(() => setSoundEnabled(sound), [sound]);
+  useEffect(() => setHapticsEnabled(haptics), [haptics]);
   const screens: Record<Tab, React.ReactNode> = {
     home: <Home go={setTab} />,
     calc: <Calculator />,

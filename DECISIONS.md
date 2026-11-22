@@ -20,6 +20,12 @@ Calls made while building without asking.
   - The noise grain no longer uses `mix-blend-mode`.
   - The header and nav fades are plain gradients.
 
+## Round 4: Liquid Glass direction
+- **The icon is now a clear glass "D"** with a bright edge on the top left and a soft shadow, on the same warm gradient. The droplet is gone. The PNG icons, the favicon and the in-app logo all use the same shape.
+- **No colour fills on controls.** Buttons are raised clear glass with white text. The selected tab, the selected chip, the "on" switch track and anything you're pressing are pushed into the surface (a darker see-through well with an inner shadow) and shrink slightly (scale 0.97).
+- **Data visuals are see-through white instead of cream**: the syringe fill, the vial meter and the weight graph. Warnings are still amber and over-capacity is still red, because those carry meaning.
+- **Haptics:** on iOS 18+ Safari, toggling a native `<input switch>` gives a system haptic tick. Every button tap clicks a hidden one, so you feel a light tick. There's a "Haptics" switch in Settings next to "Sounds". On other platforms it does nothing.
+
 ## Calculator
 - **Check mode only.** The plan / water-to-add mode is gone from the screen. `plan()` and its spec tests stay in `calc.ts`, since the spec still covers them.
 - **The result and the inputs are one card**: units, the working, the syringe bar and the strength / full doses / leftover, then vial, water and dose (with quick-pick chips) and an optional peptide name.

@@ -1,5 +1,6 @@
 // Generates the PWA / apple-touch icons as PNGs with no dependencies. Run: node scripts/make-icons.mjs
-// Design (64-unit grid, matches src/components/Logo.tsx): warm gradient field, frosted glass disc, cream droplet.
+// Design (64-unit grid, matches src/components/Logo.tsx): warm gradient field with a clear glass "D"
+// monogram — translucent body, bright specular rim lit from the top left, soft shadow underneath.
 import { writeFileSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
 
@@ -19,39 +20,49 @@ const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
 const clamp = (x) => Math.min(1, Math.max(0, x));
 const smooth = (e0, e1, x) => { const t = clamp((x - e0) / (e1 - e0)); return t * t * (3 - 2 * t); };
 
-const terracotta = [140, 74, 50], amber = [201, 138, 62], blue = [126, 147, 168], white = [255, 255, 255];
-const cream = [251, 243, 196], creamDeep = [236, 214, 150];
+const terracotta = [140, 74, 50], amber = [201, 138, 62], blue = [126, 147, 168], white = [255, 255, 255], ink = [40, 18, 10];
 
-// droplet: circle centre (32,38) r 10, tip (32,18) → half-angle 30°
-const DC = [32, 38], DR = 10, TIP = 18;
-const SIN = DR / (DC[1] - TIP), TAN = SIN / Math.sqrt(1 - SIN * SIN);
-const TANGENT_Y = TIP + Math.sqrt((DC[1] - TIP) ** 2 - DR ** 2) * Math.sqrt(1 - SIN * SIN);
-const inDrop = (x, y) =>
-  Math.hypot(x - DC[0], y - DC[1]) <= DR || (y >= TIP && y <= TANGENT_Y && Math.abs(x - DC[0]) <= (y - TIP) * TAN);
+// ---- signed distance to the "D" (negative inside) ----
+// Outer: box x 17..47, y 16..48; left corners radius 5, right corners radius 15 (so the right side is a half-round).
+// The letter is a ring of thickness T (the counter is the outer shape shrunk by T). Exact SDF, so no seams.
+function sdOuter(x, y) {
+  const px = x - 32, py = y - 32, hx = 15, hy = 16;
+  const r = px > 0 ? 15 : 5;
+  const qx = Math.abs(px) - hx + r, qy = Math.abs(py) - hy + r;
+  return Math.min(Math.max(qx, qy), 0) + Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) - r;
+}
+const T = 7.5;
+const sdD = (x, y) => { const o = sdOuter(x, y); return Math.max(o, -(o + T)); };
 
 function shade(x, y) {
-  // x,y in 0..64
   const u = x / 64, v = y / 64;
   let c = mix(terracotta, amber, smooth(0, 1, 1 - Math.hypot(u - 0.85, v - 0.1)));
   c = mix(c, blue, smooth(0.4, 1, 1 - Math.hypot(u - 0.05, v - 1)) * 0.85);
 
-  // glass disc: soft shadow, frosted fill, light rim strongest at the top
-  const dd = Math.hypot(x - 32, y - 33);
-  const sd = Math.hypot(x - 32, y - 36);
-  c = mix(c, [40, 18, 10], 0.28 * (1 - smooth(18, 26, sd)));
-  if (dd <= 21) {
-    c = mix(c, white, 0.16 + 0.1 * (1 - y / 64));
-    const rim = 1 - smooth(0, 1.1, Math.abs(dd - 20.4));
-    const top = clamp(0.25 + (33 - y) / 24);
-    c = mix(c, white, rim * 0.75 * top);
-  }
+  // soft shadow below the glass
+  const ds = sdD(x - 0.6, y - 2.2);
+  c = mix(c, ink, 0.32 * (1 - smooth(-1, 4, ds)));
 
-  // droplet shadow then droplet with vertical cream gradient and a specular highlight
-  if (inDrop(x - 0.4, y - 1.6) && !inDrop(x, y)) c = mix(c, [60, 30, 15], 0.22);
-  if (inDrop(x, y)) {
-    c = mix(cream, creamDeep, smooth(TIP, DC[1] + DR, y) * 0.9);
-    const hl = Math.hypot((x - 28.6) / 1.6, (y - 35) / 3.2);
-    c = mix(c, white, (1 - smooth(0.6, 1, hl)) * 0.8);
+  const d = sdD(x, y);
+  if (d < 0.8) {
+    const cover = 1 - smooth(-0.4, 0.4, d); // anti-aliased edge (with supersampling)
+    // surface normal from the distance field
+    const e = 0.05;
+    let nx = sdD(x + e, y) - sdD(x - e, y), ny = sdD(x, y + e) - sdD(x, y - e);
+    const nl = Math.hypot(nx, ny) || 1; nx /= nl; ny /= nl;
+    // light from the top left: an outward normal facing it is lit
+    const towardLight = clamp(nx * -0.6 + ny * -0.8);
+    const away = clamp(nx * 0.6 + ny * 0.8);
+    // clear glass body: only a light lift toward white, a touch brighter at the top
+    let g = mix(c, white, 0.1 + 0.1 * (1 - v));
+    // refraction band just inside the edge
+    const band = smooth(-3, -0.5, d) * (1 - smooth(-0.5, 0, d));
+    g = mix(g, white, band * 0.18);
+    // crisp specular rim on the lit side, faint rim on the shadow side
+    const rim = 1 - smooth(0, 1.1, Math.abs(d + 0.5));
+    g = mix(g, white, rim * (0.2 + 0.75 * towardLight));
+    g = mix(g, ink, rim * away * 0.1);
+    c = mix(c, g, cover);
   }
   return c;
 }

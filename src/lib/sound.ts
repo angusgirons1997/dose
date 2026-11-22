@@ -43,12 +43,33 @@ export const sounds = {
 
 export type SoundName = keyof typeof sounds;
 
-/** One delegated listener: any button plays its data-sound (default "tap"), "none" to skip. */
+// Haptics: iOS 18+ Safari gives a system haptic tick when a native <input switch> toggles, and a
+// label click toggles it. Elsewhere this is a harmless no-op. shortcut: relies on that WebKit behaviour.
+let hapticsOn = true;
+let hapticLabel: HTMLLabelElement | null = null;
+export const setHapticsEnabled = (on: boolean) => { hapticsOn = on; };
+function haptic() {
+  if (!hapticLabel) {
+    const input = Object.assign(document.createElement('input'), { type: 'checkbox', id: 'dose-haptic', tabIndex: -1 });
+    input.setAttribute('switch', '');
+    input.setAttribute('aria-hidden', 'true');
+    hapticLabel = Object.assign(document.createElement('label'), { htmlFor: 'dose-haptic' });
+    hapticLabel.setAttribute('aria-hidden', 'true');
+    const box = document.createElement('div');
+    box.style.cssText = 'position:fixed;left:-100px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none';
+    box.append(input, hapticLabel);
+    document.body.append(box);
+  }
+  hapticLabel.click();
+}
+
+/** One delegated listener: any button gives a haptic tick and plays its data-sound (default "tap"; "none" skips). */
 export function installClickSounds() {
   const onClick = (e: MouseEvent) => {
-    if (!enabled) return;
     const el = (e.target as Element).closest<HTMLElement>('button, label.pill-btn, [role="switch"]');
     if (!el || (el as HTMLButtonElement).disabled) return;
+    if (hapticsOn) haptic();
+    if (!enabled) return;
     const name = (el.dataset.sound ?? 'tap') as SoundName | 'none';
     if (name !== 'none') sounds[name]?.();
   };

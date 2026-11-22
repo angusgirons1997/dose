@@ -12,6 +12,7 @@ export function Settings({ onClose }: { onClose: () => void }) {
   const lastBackup = useSetting<string | null>('lastBackup', null);
   const persisted = useSetting<boolean | null>('persisted', null);
   const sound = useSetting('sound', true);
+  const haptics = useSetting('haptics', true);
   const fileRef = useRef<HTMLInputElement>(null);
   const [msg, setMsg] = useState('');
   const set = (p: Partial<Prefs>) => setSetting('prefs', { ...prefs, ...p });
@@ -62,8 +63,9 @@ export function Settings({ onClose }: { onClose: () => void }) {
         <Segmented<CapacityMl> label="Capacity" value={prefs.capacityMl} onChange={(capacityMl) => set({ capacityMl })} options={[{ value: 0.3, label: '0.3 mL' }, { value: 0.5, label: '0.5 mL' }, { value: 1, label: '1 mL' }]} />
       </Glass>
 
-      <Glass className="tight">
+      <Glass className="tight stack">
         <Toggle label="Sounds" checked={sound} onChange={(v) => setSetting('sound', v)} />
+        <Toggle label="Haptics (iPhone)" checked={haptics} onChange={(v) => setSetting('haptics', v)} />
       </Glass>
 
       <Glass className="tight small muted stack" style={{ gap: 6 }}>

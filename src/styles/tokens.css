@@ -5,8 +5,11 @@
   --hairline: rgba(255, 255, 255, 0.14);
   --radius-card: 32px;
   --radius-pill: 999px;
-  --cream: #fbf3c4;
-  --cream-ink: #1a1a1a;
+  /* raised glass (rest) and pressed-in well (selected / tapped) */
+  --raised-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.1));
+  --raised-shadow: 0 6px 16px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+  --well-bg: rgba(0, 0, 0, 0.16);
+  --well-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.32), inset 0 -1px 0 rgba(255, 255, 255, 0.14), 0 1px 0 rgba(255, 255, 255, 0.08);
   --text: #ffffff;
   --text-muted: rgba(255, 255, 255, 0.62);
   --amber: #ffc76b;
